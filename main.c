@@ -96,6 +96,5 @@ int main(int argc, char **argv) {
 	t_init input;
 
 	parse_input(argc, argv, &input);
-	printf("%d", (unsigned int)input.lRart);
 	return 0;
 }
