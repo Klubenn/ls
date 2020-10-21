@@ -1,100 +1,74 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
+#include "ls.h"
 
-typedef struct      s_init {
-	unsigned char   lRart;
-	char            **args;
-}                   t_init;
-
-int parse_args_num(int ac, char **av)
+t_node	*new_node(t_data *data)
 {
-	int i;
-	int num;
+	t_node *new;
 
-	i = 0;
-	num = 0;
-	while (++i < ac)
-	{
-		if (av[i][0] != '-')
-			num++;
-	}
-	return num;
+	new = (t_node *)ft_memalloc(sizeof(t_node));
+	if (!new)
+		return (NULL);
+	new->name = data->name;
+	new->height = 1;
+	new->data = data;
+	return (new);
 }
 
-char **parse_args(int ac, char **av)
+int	additional_comparison(t_init *init, t_node *node, t_data *data)
 {
-	char    **args;
-	int     len;
-	int     i;
-	int     j;
+	int result;
 
-	len = parse_args_num(ac, av);
-	if (!(args = (char **)malloc(sizeof(char *) * (len + 1))))//todo replace to ft_memalloc
-		return (NULL);
-	i = 0;
-	j = 0;
-	while (++i < ac)
+	if (init->flag & flag_r)
+		result = sort_by_name_rev(node->name, data);
+	else
+		result = sort_by_name(node->name, data);
+	return (result);
+}
+
+t_node 	*insert_node(t_init *init, t_node *node, t_data *data)
+{
+	int result;
+
+	if (!node)
+		return (new_node(data));
+	result = init->comparing_func(node->comparing_data, data);
+	if (result == 0)
+		result = additional_comparison(init, node, data);
+	if (result == -1)
+		node->left = insert_node(init, node->left, data);
+	else if (result == 1)
+		node->right = insert_node(init, node->right, data);
+	return (balance(node))
+}
+
+void	collect_data(t_init *init, char *path)
+{
+
+
+	init->head = insert_node(init, init->head, data);
+}
+
+void	analysis(t_init *init)
+{
+	char **args;
+
+	args = init->args;
+	if (!args)
+		collect_data(init, ".");
+	else
 	{
-		if (av[i][0] != '-')
+		while (*args)
 		{
-			if (!(args[j] = strdup(av[i])))//todo replace strdup
-			{
-				while (--j >= 0)
-					free(args[j]);
-				free(args);
-				return (NULL);
-			}
-			j++;
+			collect_data(init, *args);
+			(*args)++;
 		}
 	}
-	return (args);
-}
-
-unsigned char parse_flags(char *str)
-{
-	unsigned char num;
-
-	num = 0;
-	while (*str)
-	{
-		if (*str == 'l')
-			num = num | 1 << 4;
-		else if (*str == 'R')
-			num = num | 1 << 3;
-		else if (*str == 'a')
-			num = num | 1 << 2;
-		else if (*str == 'r')
-			num = num | 1 << 1;
-		else if (*str == 't')
-			num = num | 1;
-		else
-			printf("Unknown flag -%c\n", *str);//todo replace with ft_printf
-		str++;
-	}
-	return (num);
-}
-
-void parse_input(int ac, char **av, t_init *input)
-{
-	int				i;
-	unsigned char   flags;
-
-	i = 0;
-	flags = 0;
-	while (++i < ac)
-	{
-		if (av[i][0] == '-')
-			flags = flags | parse_flags(av[i] + 1);
-	}
-	input->args = parse_args(ac, av);
-	input->lRart = flags;
 }
 
 int main(int argc, char **argv) {
-	t_init input;
+	t_init init;
 
-	parse_input(argc, argv, &input);
+	parse_input(argc, argv, &init);
+	select_compare_function(&init);
+	analysis(&init);
 	return 0;
 }
