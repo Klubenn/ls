@@ -1,6 +1,7 @@
 #include "ls.h"
 
 /*
+ * Сортировка по имени. Принимает название файла и дата-структуру ноды дерева.
  * If new data is bigger than node/should be listed after, returns 1
  * If equal - returns 0
  * If new data is smaller, returns -1
@@ -35,6 +36,13 @@ int sort_by_modification_time(void *time, t_data *data)
 int sort_by_modification_time_rev(void *time, t_data *data)
 {}
 
+/*
+ * Определение принципа сортировки дерева, в котором будет храниться
+ * содержимое выводимой директории. Принимает начальную струкруру, в
+ * которой хранится базовая информация. Принцип сортировки определяется
+ * в зависимости от флагов. В структуру вносится адрес выбранной функции
+ * сортировки. Ничего не возвращает.
+ */
 void	select_compare_function(t_init *init)
 {
 	if (!(init->flag & flag_t) && !(init->flag & flag_r))

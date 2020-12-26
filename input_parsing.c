@@ -1,5 +1,8 @@
 #include "ls.h"
 
+/*
+ * Подсчёт количества аргументов не-флагов. Возвращает число.
+ */
 int parse_args_num(int ac, char **av)
 {
 	int i;
@@ -15,6 +18,10 @@ int parse_args_num(int ac, char **av)
 	return num;
 }
 
+/*
+ * Парсинг аргументов не-флагов - пути для вывода. Принимает кол-во
+ * аргументов и сами аргументы. Возвращает массив строк путей.
+ */
 char **parse_args(int ac, char **av)
 {
 	char    **args;
@@ -44,6 +51,10 @@ char **parse_args(int ac, char **av)
 	return (args);
 }
 
+/*
+ * Парсинг флагов. На вход принимается строка. Возвращается битовая маска
+ * размера 1 байт.
+ */
 unsigned char parse_flags(char *str)
 {
 	unsigned char num;
@@ -68,6 +79,11 @@ unsigned char parse_flags(char *str)
 	return (num);
 }
 
+/*
+ * Парсинг входных аргументов. Принимает кол-во аргументов, сами аргументы и
+ * начальную структуру, в которую будет положен результат обработки. Структура
+ * наполняется полями флаги (битовая маска) и аргументы (массива строк).
+ */
 void parse_input(int ac, char **av, t_init *input)
 {
 	int				i;
