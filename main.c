@@ -1,5 +1,6 @@
 #include "ls.h"
 
+
 /*
  * Создание новой ноды для дерева, принимает дату, заполняет имя,
  * высоту и сохраняет саму дату.
@@ -11,7 +12,6 @@ t_node	*new_node(t_data *data)
 	new = (t_node *)ft_memalloc(sizeof(t_node));
 	if (!new)
 		return (NULL);
-	new->name = data->name;
 	new->height = 1;
 	new->data = data;
 	return (new);
@@ -30,9 +30,9 @@ int	additional_comparison(t_init *init, t_node *node, t_data *data)
 	int result;
 
 	if (init->flag & flag_r)
-		result = sort_by_name_rev(node->name, data);
+		result = sort_by_name_rev(node->data, data);
 	else
-		result = sort_by_name(node->name, data);
+		result = sort_by_name(node->data, data);
 	return (result);
 }
 
@@ -57,14 +57,14 @@ t_node 	*insert_node(t_init *init, t_node *node, t_data *data)
 
 	if (!node)
 		return (new_node(data));
-	result = init->comparing_func(node->comparing_data, data);
+	result = init->comparing_func(node->data, data);
 	if (result == 0)
 		result = additional_comparison(init, node, data);
 	if (result == -1)
 		node->left = insert_node(init, node->left, data);
 	else if (result == 1)
 		node->right = insert_node(init, node->right, data);
-	return (balance(node))
+	return (balance(node));
 }
 
 /*
@@ -87,7 +87,7 @@ void	collect_data(t_init *init, char *path)
 void	analysis(t_init *init)
 {
 	char **args;
-
+//todo переделать по типам аргументов и нужна их предварительная сортировка
 	args = init->args;
 	if (!args)
 		collect_data(init, ".");
@@ -106,7 +106,6 @@ int main(int argc, char **argv) {
 
 	parse_input(argc, argv, &init);
 	select_compare_function(&init);
-	//todo вставить сортировку аргументов-путей на файлы и директории
 	analysis(&init);
 	return 0;
 }

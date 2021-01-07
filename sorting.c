@@ -6,13 +6,13 @@
  * If equal - returns 0
  * If new data is smaller, returns -1
  */
-int	sort_by_name(void *name, t_data *data)
+int	sort_by_name(t_data *old_data, t_data *new_data)
 {
 	char *new_name;
 	char *old_name;
 
-	new_name = data->name;
-	old_name = (char *)name;
+	new_name = new_data->name;
+	old_name = old_data->name;
 	while (*old_name && *new_name && *old_name != *new_name)
 	{
 		old_name++;
@@ -25,15 +25,15 @@ int	sort_by_name(void *name, t_data *data)
 	return (0);
 }
 
-int	sort_by_name_rev(void *name, t_data *data)
+int	sort_by_name_rev(t_data *old_data, t_data *new_data)
 {
-	return (-(sort_by_name(name, data)));
+	return (-(sort_by_name(old_data, new_data)));
 }
 
-int sort_by_modification_time(void *time, t_data *data)
+int sort_by_modification_time(t_data *old_data, t_data *new_data)
 {}
 
-int sort_by_modification_time_rev(void *time, t_data *data)
+int sort_by_modification_time_rev(t_data *old_data, t_data *new_data)
 {}
 
 /*
