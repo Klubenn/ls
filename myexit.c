@@ -1,5 +1,5 @@
 #include "ls.h"
-
+//todo this is not needed if in parse_args strdup is not used
 //void free_args(char **args)
 //{
 //	int i;
@@ -13,7 +13,7 @@
 //	free(args);
 //}
 
-void free_node(t_node *node)
+void	free_node(t_node *node)
 {
 	if (!node)
 		return;
@@ -21,15 +21,14 @@ void free_node(t_node *node)
 	{
 		if (node->data->name)
 			free(node->data->name);
-		if (node->data->modify_time)
-			free(node->data->modify_time);
+
 		/////////////
 		free(node->data);
 	}
 	free(node);
 }
 
-void free_tree(t_node *node)
+void	free_tree(t_node *node)
 {
 	if (!node)
 		return;
@@ -40,9 +39,8 @@ void free_tree(t_node *node)
 	free_node(node);
 }
 
-void myexit(t_init *input, int err)
+void	myexit(t_init *input, int err)
 {
-
 	if (input)
 	{
 		if (input->args_files)

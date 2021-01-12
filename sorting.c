@@ -45,13 +45,13 @@ int sort_by_modification_time_rev(t_data *old_data, t_data *new_data)
  */
 void	select_compare_function(t_init *init)
 {
-	if (!(init->flag & flag_t) && !(init->flag & flag_r))
+	if (!(init->flag & FLAG_t) && !(init->flag & FLAG_r))
 		init->comparing_func = &sort_by_name;
-	else if (!(init->flag & flag_t) && (init->flag & flag_r))
+	else if (!(init->flag & FLAG_t) && (init->flag & FLAG_r))
 		init->comparing_func = &sort_by_name_rev;
-	else if ((init->flag & flag_t) && !(init->flag & flag_r))
+	else if ((init->flag & FLAG_t) && !(init->flag & FLAG_r))
 		init->comparing_func = &sort_by_modification_time;
-	else if ((init->flag & flag_t) && (init->flag & flag_r))
+	else if ((init->flag & FLAG_t) && (init->flag & FLAG_r))
 		init->comparing_func = &sort_by_modification_time_rev;
 }
 

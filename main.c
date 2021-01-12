@@ -29,7 +29,7 @@ int	additional_comparison(t_init *init, t_node *node, t_data *data)
 {
 	int result;
 
-	if (init->flag & flag_r)
+	if (init->flag & FLAG_r)
 		result = sort_by_name_rev(node->data, data);
 	else
 		result = sort_by_name(node->data, data);
@@ -67,30 +67,86 @@ t_node 	*insert_node(t_init *init, t_node *node, t_data *data)
 	return (balance(node));
 }
 
+t_data *copy_t_data(t_data *data)
+{
+	t_data *new;
+
+	new = (t_data *)ft_memalloc(sizeof(t_data));
+	///
+}
+
+void	add_element_to_dir_list(t_init *init, t_node *node)
+{
+	t_dir_list *current_dir;
+
+	if (!node->data->)//todo добавить проверку на директорию
+		return;
+	current_dir = (t_dir_list *)ft_memalloc(sizeof(t_dir_list));
+	if (!current_dir)
+		return (myexit(init, ENOMEM));
+	current_dir->next = init->dir_list;
+	init->dir_list = current_dir;
+	current_dir->data = copy_t_data(node->data);
+	if (!current_dir->data)
+		return (myexit(init, ENOMEM));
+}
+
+void	collect_dirs_from_tree(t_init *init)
+{
+	apply_infix(init, init->head, &add_element_to_dir_list);
+	///
+}
+
 /*
  * Здесь должны будут собираться все данные по файлу или содержимому
  * директории по заданному пути, создаваться структура дата, вставляться
  * в дерево. Принимает на вход начальную структуру и путь.
  */
-void	collect_data(t_init *init, char *path)
+void	collect_data_from_dir(t_init *init, char *path)
 {
+	DIR *d;
+	struct dirent *elem;
+	struct stat buf;
+	t_data *data;
+
+	if (!path)
+		return;
+	d = opendir(path);
+	if (d)
+	{
+		while ((elem = readdir(d)) != NULL)
+		{
+			if (stat(elem->d_name, &buf) == 0)
+			{
+				data = new_data(elem, buf);
+				init->head = insert_node(init, init->head, data);
+			}
+			else
+				printf("Error getting data for %s\n", elem->d_name);
+		}
+		closedir(d);
+	}
 
 
-	init->head = insert_node(init, init->head, data);
+
+	//
+	if (init->flag & FLAG_R)
+		collect_dirs_from_tree(init);
 }
 
 /*
  * Начало обработки аргументов. При их отсутствии обрабатывается
- * текущая директория. В противном случае аргументы обрабатываются
- * в порядке поступления.
+ * текущая директория. В противном случае сначала обрабатываются и
+ * выводятся все файлы из поданных на вход аргументов, а затем директории.
  */
 void	analysis(t_init *init)
 {
-	char **args;
-//todo переделать по типам аргументов и нужна их предварительная сортировка
-	args = init->args;
-	if (!args)
-		collect_data(init, ".");
+	if (!init->args_files && !init->args_dirs)
+	{
+		collect_data_from_dir(init, ".");
+		apply_infix(init, init->head, init->print_func);
+		free_tree(init->head);
+	}
 	else
 	{
 		while (*args)
@@ -106,6 +162,7 @@ int main(int argc, char **argv) {
 
 	parse_input(argc, argv, &init);
 	select_compare_function(&init);
+	select_print_function(&init);
 	analysis(&init);
 	return 0;
 }

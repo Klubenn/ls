@@ -1,13 +1,30 @@
 #include "ls.h"
 
+/*
+ * Определение того, файл или директория пришли на вход. Если файл, то
+ * возвращается значение LS_FILE, если директория, то LS_DIR, если такого
+ * файла/директории не существует, то LS_NOSUCHFILE.
+ */
 int	dir_or_file(char *av)
 {
+	struct stat buf;
 
+	if (stat(av, &buf) == 0)
+	{
+		if (S_ISDIR(buf.st_mode))
+			return (LS_DIR);
+		else
+			return (LS_FILE);
+	}
+	return (LS_NOSUCHFILE);
 }
 
 /*
  * Парсинг аргументов не-флагов - пути для вывода. Принимает кол-во
- * аргументов и сами аргументы. Возвращает массив строк путей.
+ * аргументов, сами аргументы, кол-во аргументов не-флагов и начальную
+ * структуру. Записывает в структуру отдельно аргументы-директории и
+ * аргументы-файлы. Возвращает 0 при успехе или ENOMEM при нехватке памяти
+ * для маллока.
  */
 int parse_args(int ac, char **av, int argnum, t_init *input)
 {
@@ -48,38 +65,20 @@ unsigned char parse_flags(char *str)
 	while (*str)
 	{
 		if (*str == 'l')
-			num = flag_l;
+			num = FLAG_l;
 		else if (*str == 'R')
-			num = flag_R;
+			num = FLAG_R;
 		else if (*str == 'a')
-			num = flag_a;
+			num = FLAG_a;
 		else if (*str == 'r')
-			num = flag_r;
+			num = FLAG_r;
 		else if (*str == 't')
-			num = flag_t;
+			num = FLAG_t;
 		else
 			printf("Unknown flag -%c\n", *str);//todo replace with ft_printf
 		str++;
 	}
 	return (num);
-}
-
-/*
- * Запись файлов и директорий по отдельности в структуру input.
- */
-void split_dirs_and_files(char **args, t_init *input)
-{
-	int i;
-
-	if (args == NULL)
-		return;
-	input->args_dirs = (char **)ft_memalloc(sizeof(char *) );
-	i = 0;
-	while (args[i])
-	{
-
-		i++;
-	}
 }
 
 /*

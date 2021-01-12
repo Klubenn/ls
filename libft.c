@@ -19,7 +19,7 @@ int	ft_tolower(int c)
 void	ft_bzero(void *s, unsigned long n)
 {
 	unsigned char	*u;
-	unsigned long			i;
+	unsigned long	i;
 
 	u = s;
 	i = 0;

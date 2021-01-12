@@ -5,17 +5,23 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
-#include "libft.c" //todo remove
 #include <sys/stat.h>
 #include <errno.h>
+#include <dirent.h>
+
+#include "libft.c" //todo remove
 
 enum
 {
-	flag_l = 1,		//одна колонка, подробный вывод
-	flag_R = (unsigned int)1 << 1,	//рекурсия по папкам
-	flag_a = (unsigned int)1 << 2,	//скрытые файлы и папки
-	flag_r = (unsigned int)1 << 3,	//обратный порядок сортировки
-	flag_t = (unsigned int)1 << 4,	//сортировка по времени изменения, новое сверху
+	FLAG_l = (unsigned int)1,		//одна колонка, подробный вывод
+	FLAG_R = (unsigned int)1 << 1,	//рекурсия по папкам
+	FLAG_a = (unsigned int)1 << 2,	//скрытые файлы и папки
+	FLAG_r = (unsigned int)1 << 3,	//обратный порядок сортировки
+	FLAG_t = (unsigned int)1 << 4,	//сортировка по времени изменения, новое сверху
+	FLAG_u = (unsigned int)1 << 5,	//сортировка по времени последнего доступа к файлу
+	FLAG_f = (unsigned int)1 << 6,	//не сортировать
+	FLAG_g = (unsigned int)1 << 7,	//как l, но не выводит имя владельца
+	FLAG_d = (unsigned int)1 << 8,	//каталоги выводятся как обычные файлы, опция R игнорируется
 };
 
 enum
@@ -25,31 +31,37 @@ enum
 	LS_FILE,
 };
 
-typedef struct	s_node t_node;
-
 typedef struct		s_data
 {
 	char			*name;
-	char			*modify_time;
+	struct stat		*stat;
+	struct dirent	*dirent;
 	//////////////////////////
 }					t_data;
 
-struct				s_node
+typedef struct		s_node
 {
 	t_data			*data;
-	t_node			*left;
-	t_node			*right;
+	struct s_node	*left;
+	struct s_node	*right;
 	unsigned char	height;
-};
+}					t_node;
+
+typedef struct		s_dir_list
+{
+	t_data				*data;
+	struct s_dir_list	*next;
+}					t_dir_list;
 
 typedef struct      s_init
 {
-	unsigned char   flag;
+	unsigned int	flag;
 	char            **args_files;
 	char            **args_dirs;
 	int				(*comparing_func)(void *, t_data *);
-	int				(*print_func)(t_node *);
+	void			(*print_func)(t_node *);
 	t_node			*head;
+	t_dir_list		*dir_list;
 }                   t_init;
 
 void	parse_input(int ac, char **av, t_init *init);
@@ -59,5 +71,8 @@ int		sort_by_name(t_data *old_data, t_data *new_data);
 int		sort_by_name_rev(t_data *old_data, t_data *new_data);
 t_node	*insert_node(t_init *init, t_node *node, t_data *data);
 void	myexit(t_init *input, int err);
+void	free_tree(t_node *node);
+void	apply_infix(t_init *init, t_node *node, void (*callback_func)(t_init *, t_node *));
+void	select_print_function(t_node *init);
 
 #endif //LS_LS_H
