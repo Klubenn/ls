@@ -1,36 +1,22 @@
-#include <sys/stat.h>
 #include <stdio.h>
-#include <errno.h>
+#include "ls.h"
 
-int main(int ac, char **av)
+void test_parsing(t_init *init)
 {
-	int i;
-	int j;
-	int dir;
-	int file;
-	struct stat buf;
+	// test flags
+	printf("%u - flags\n", init->flag);
 
-	i = 0;
-	dir = 0;
-	file = 0;
-	while (--ac > 0 && ++av)
+	// test args
+	char **dir = init->args_dirs;
+	char **file = init->args_files;
+	while(*dir)
 	{
-		if (*av && *av[0] != '-')
-		{
-			errno = 0;
-			j = stat(*av, &buf);
-			if (j == 0)
-			{
-				if (S_ISDIR(buf.st_mode))
-					dir++;
-				else
-					file++;
-				printf("+++%s\n", *av);
-			}
-			else
-				printf("%s - does not exist; %d\n", *av, errno);
-		}
+		printf("%s - directory\n", *dir);
+		dir++;
 	}
-	printf("%d - files, %d - directories\n", file, dir);
-	return 0;
+	while(*file)
+	{
+		printf("%s - file\n", *file);
+		file++;
+	}
 }

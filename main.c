@@ -75,12 +75,15 @@ t_data *copy_t_data(t_data *data)
 	///
 }
 
+/*
+ * Эти 2 функции нужны для рекурсивного обхода директорий
+ */
 void	add_element_to_dir_list(t_init *init, t_node *node)
 {
 	t_dir_list *current_dir;
 
-	if (!node->data->)//todo добавить проверку на директорию
-		return;
+//	if (!node->data->)//todo добавить проверку на директорию
+//		return;
 	current_dir = (t_dir_list *)ft_memalloc(sizeof(t_dir_list));
 	if (!current_dir)
 		return (myexit(init, ENOMEM));
@@ -91,6 +94,9 @@ void	add_element_to_dir_list(t_init *init, t_node *node)
 		return (myexit(init, ENOMEM));
 }
 
+/*
+ * обход текущего дерева для сбора директорий для рекурсии
+ */
 void	collect_dirs_from_tree(t_init *init)
 {
 	apply_infix(init, init->head, &add_element_to_dir_list);
@@ -139,7 +145,7 @@ void	collect_data_from_dir(t_init *init, char *path)
  * текущая директория. В противном случае сначала обрабатываются и
  * выводятся все файлы из поданных на вход аргументов, а затем директории.
  */
-void	analysis(t_init *init)
+void	analysis_ls(t_init *init)
 {
 	if (!init->args_files && !init->args_dirs)
 	{
@@ -157,12 +163,17 @@ void	analysis(t_init *init)
 	}
 }
 
+
+
+
 int main(int argc, char **argv) {
 	t_init init;
 
 	parse_input(argc, argv, &init);
+//	test_parsing(&init);
+	absent_arguments(&init);
 	select_compare_function(&init);
-	select_print_function(&init);
-	analysis(&init);
+//	select_print_function(&init);
+	analysis_ls(&init);
 	return 0;
 }

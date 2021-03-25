@@ -31,19 +31,22 @@ int parse_args(int ac, char **av, int argnum, t_init *input)
 	int	dir;
 	int file;
 	int res;
+	int abs;
 
 	if (!(input->args_dirs = (char **)ft_memalloc(sizeof(char *) * (argnum + 1))) ||
-			!(input->args_files = (char **)ft_memalloc(sizeof(char *) * (argnum + 1))))
+			!(input->args_files = (char **)ft_memalloc(sizeof(char *) * (argnum + 1))) ||
+			!(input->args_absent = (char **)ft_memalloc(sizeof(char *) * (argnum + 1))))
 		return (ENOMEM);
 	dir = -1;
 	file = -1;
+	abs = -1;
 	while (--ac > 0 && ++av)
 	{
 		if (*av && *av[0] != '-')
 		{
 			res = dir_or_file(*av);
 			if (res == LS_NOSUCHFILE)
-				printf("ft_ls: %s: No such file or directory\n", *av);
+				input->args_absent[++abs] = *av;
 			else if (res == LS_DIR)
 				input->args_dirs[++dir] = *av;
 			else
@@ -65,17 +68,19 @@ unsigned char parse_flags(char *str)
 	while (*str)
 	{
 		if (*str == 'l')
-			num = FLAG_l;
+			num += FLAG_l;
 		else if (*str == 'R')
-			num = FLAG_R;
+			num += FLAG_R;
 		else if (*str == 'a')
-			num = FLAG_a;
+			num += FLAG_a;
 		else if (*str == 'r')
-			num = FLAG_r;
+			num += FLAG_r;
 		else if (*str == 't')
-			num = FLAG_t;
+			num += FLAG_t;
+		else if (*str == 'f')
+			num += FLAG_f;
 		else
-			printf("Unknown flag -%c\n", *str);//todo replace with ft_printf
+			ft_printf("Unknown flag -%c\n", *str);//todo replace with ft_printf
 		str++;
 	}
 	return (num);

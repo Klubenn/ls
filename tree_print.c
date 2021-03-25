@@ -19,7 +19,7 @@ void	apply_infix(t_init *init, t_node *node, void (*callback_func)(t_init *, t_n
 	}
 }
 
-void	select_print_function(t_node *init)
+void	select_print_function(t_init *init)
 {
 
 }

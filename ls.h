@@ -9,7 +9,7 @@
 #include <errno.h>
 #include <dirent.h>
 
-#include "libft.c" //todo remove
+#include "libft/ft_printf/includes/header_pf.h"
 
 enum
 {
@@ -53,12 +53,22 @@ typedef struct		s_dir_list
 	struct s_dir_list	*next;
 }					t_dir_list;
 
+/*
+ * flag - флаги: -lRart;
+ * args_dirs - аргументы директории
+ * args_files - остаьные аргументы (файлы)
+ * comparing_func - функция сравнения, по которой будет проходить сортировка
+ * print_func - функция печати
+ * head - вершина бинарного дерева
+ * dir_list - не помню
+ */
 typedef struct      s_init
 {
 	unsigned int	flag;
+	char 			**args_absent;
 	char            **args_files;
 	char            **args_dirs;
-	int				(*comparing_func)(void *, t_data *);
+	int				(*comparing_func)(t_data *, t_data *);
 	void			(*print_func)(t_node *);
 	t_node			*head;
 	t_dir_list		*dir_list;
@@ -73,6 +83,10 @@ t_node	*insert_node(t_init *init, t_node *node, t_data *data);
 void	myexit(t_init *input, int err);
 void	free_tree(t_node *node);
 void	apply_infix(t_init *init, t_node *node, void (*callback_func)(t_init *, t_node *));
-void	select_print_function(t_node *init);
+void	select_print_function(t_init *init);
+void	absent_arguments(t_init *init);
+
+
+void test_parsing(t_init *init);
 
 #endif //LS_LS_H
