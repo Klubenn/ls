@@ -1,0 +1,8 @@
+cmake_minimum_required(VERSION 3.15)
+project(ls)
+set(CMAKE_C_STANDARD 99)
+set(SOURCE_FILES input_parsing.c main.c myexit.c sorting.c tree_balance.c tree_print.c test.c absent_arguments.c)
+set(INCLUDE_FILES ls.h  libft/libft.h libft/ft_printf/includes/header_pf.h )
+add_executable(ls ${SOURCE_FILES} ${INCLUDE_FILES})
+target_link_libraries(ls /Users/gtristan/CLionProjects/ls/libft/libft.a)
+target_link_libraries(ls /Users/gtristan/CLionProjects/ls/libft/ft_printf/libftprintf.a)
