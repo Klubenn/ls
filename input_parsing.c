@@ -80,7 +80,7 @@ unsigned char parse_flags(char *str)
 		else if (*str == 'f')
 			num += FLAG_f;
 		else
-			ft_printf("Unknown flag -%c\n", *str);//todo replace with ft_printf
+			printf("Unknown flag -%c\n", *str);//todo replace with ft_printf
 		str++;
 	}
 	return (num);

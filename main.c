@@ -97,10 +97,24 @@ void	add_element_to_dir_list(t_init *init, t_node *node)
 /*
  * обход текущего дерева для сбора директорий для рекурсии
  */
-void	collect_dirs_from_tree(t_init *init)
+t_dir_list	*collect_dirs_from_tree(t_init *init)
 {
 	apply_infix(init, init->head, &add_element_to_dir_list);
 	///
+}
+
+void	read_stat(t_init *init, char *path)
+{
+	struct stat buf;
+	t_data *data;
+
+	if (stat(path, &buf) == 0)
+	{
+		data = new_data(elem, buf);
+		init->head = insert_node(init, init->head, data);
+	}
+	else
+		printf("Error getting data for %s\n", elem->d_name);
 }
 
 /*
@@ -112,8 +126,9 @@ void	collect_data_from_dir(t_init *init, char *path)
 {
 	DIR *d;
 	struct dirent *elem;
-	struct stat buf;
-	t_data *data;
+
+	t_dir_list *list;
+	char *join_path;
 
 	if (!path)
 		return;
@@ -122,22 +137,37 @@ void	collect_data_from_dir(t_init *init, char *path)
 	{
 		while ((elem = readdir(d)) != NULL)
 		{
-			if (stat(elem->d_name, &buf) == 0)
-			{
-				data = new_data(elem, buf);
-				init->head = insert_node(init, init->head, data);
-			}
-			else
-				printf("Error getting data for %s\n", elem->d_name);
+			join_path = ft_strjoin(path, elem->d_name);
+			read_stat(init, join_path);
+			free(join_path);
 		}
 		closedir(d);
 	}
-
-
-
-	//
+	else
+	{
+		printf("Can't open dir %s\n", path);
+	}
+	print_tree();
 	if (init->flag & FLAG_R)
-		collect_dirs_from_tree(init);
+	{
+		list = collect_dirs_from_tree(init);
+		while (list)
+		{
+			collect_data_from_dir(init, list->data->name);
+			list = list->next;
+		}
+
+	}
+}
+
+void collect_elements(char **elements)
+{
+	while (*elements)
+	{
+		// сбор данных по файлу/директории
+		// отправка данных в дерево
+		elements++;
+	}
 }
 
 /*
@@ -147,25 +177,33 @@ void	collect_data_from_dir(t_init *init, char *path)
  */
 void	analysis_ls(t_init *init)
 {
+	t_dir_list *list;
+
 	if (!init->args_files && !init->args_dirs)
-	{
 		collect_data_from_dir(init, ".");
-		apply_infix(init, init->head, init->print_func);
-		free_tree(init->head);
-	}
-	else
+	if (init->args_files)
+		collect_elements(init->args_files);
+	if (init->head)
 	{
-		while (*args)
+		print_tree();
+		free_tree();
+	}
+	if (init->args_dirs)
+	{
+		collect_elements(init->args_files);
+		list = collect_dirs_from_tree();
+		free_tree();
+		while (list)
 		{
-			collect_data(init, *args);
-			(*args)++;
+			collect_data_from_dir(init, list->data->name);
+			list = list->next;
 		}
 	}
 }
 
 
 
-
+// gcc *.c  -L./libft -lft
 int main(int argc, char **argv) {
 	t_init init;
 

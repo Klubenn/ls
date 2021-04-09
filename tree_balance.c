@@ -13,7 +13,7 @@ unsigned char	height(t_node *node)
  */
 int balance_factor(t_node *node)
 {
-	return (height(node->left) - height(node->right));
+	return (height(node->right) - height(node->left));
 }
 
 /*
