@@ -103,18 +103,89 @@ t_dir_list	*collect_dirs_from_tree(t_init *init)
 	///
 }
 
-void	read_stat(t_init *init, char *path)
+void	fill_file_type(t_data *data, mode_t mode)
+{
+	mode &= S_IFMT;
+	if (mode == S_IFREG)
+		data->rights[0] = '-';
+	else if (mode  == S_IFLNK)
+		data->rights[0] = 'l';
+	else if (mode == S_IFDIR)
+		data->rights[0] = 'd';
+	else if (mode == S_IFCHR)
+		data->rights[0] = 'c';
+	else if (mode == S_IFBLK)
+		data->rights[0] = 'b';
+	else if (mode == S_IFSOCK)
+		data->rights[0] = 's';
+	else if (mode == S_IFIFO)
+		data->rights[0] = 'p';
+}
+
+void	fill_rights(t_data *data, mode_t mode, bool attr)
+{
+	data->rights[1] = (mode & S_IRUSR)? 'r' : '-';
+	data->rights[2] = (mode & S_IWUSR)? 'w' : '-';
+	data->rights[3] = (mode & S_IXUSR)? 'x' : '-';
+	data->rights[4] = (mode & S_IRGRP)? 'r' : '-';
+	data->rights[5] = (mode & S_IWGRP)? 'w' : '-';
+	data->rights[6] = (mode & S_IXGRP)? 'x' : '-';
+	data->rights[7] = (mode & S_IROTH)? 'r' : '-';
+	data->rights[8] = (mode & S_IWOTH)? 'w' : '-';
+	data->rights[9] = (mode & S_IXOTH)? 'x' : '-';
+	data->rights[10] = attr? '@' : ' ';
+	data->rights[11] = 0;
+}
+
+void	fill_data_rights(t_data *data, mode_t mode, bool attr)
+{
+	fill_file_type(data, mode);
+	fill_rights(data, mode, attr);
+}
+
+t_data *new_data(struct dirent *elem, struct stat *buf, bool attr)
+{
+	t_data *data;
+
+	data = (t_data *) ft_memalloc(sizeof(t_data));
+	if (!data)
+		return (NULL);
+	fill_data_rights(data, buf->st_mode, attr);
+
+
+	///////////////////
+	return data;
+}
+
+bool list_attr(char *path)
+{
+	bool attr;
+
+	attr = false;
+	errno = 0;
+	if (listxattr(path, NULL, 0, XATTR_NOFOLLOW) && errno == 0)
+		attr = true;
+	errno = 0;
+	return (attr);
+}
+
+void	read_stat(t_init *init, char *path, struct dirent *elem)
 {
 	struct stat buf;
 	t_data *data;
 
-	if (stat(path, &buf) == 0)
+	if (lstat(path, &buf) == 0)
 	{
-		data = new_data(elem, buf);
-		init->head = insert_node(init, init->head, data);
+		data = new_data(elem, &buf, list_attr(path));
+		if (!data)
+			return (myexit(init, ENOMEM));
+		printf("%s %s\n", data->rights, path); //////////////////
+
+//		init->head = insert_node(init, init->head, data);
+		init->num_of_nodes += 1;
 	}
 	else
-		printf("Error getting data for %s\n", elem->d_name);
+		printf("Error getting data for %s\n", path);
 }
 
 /*
@@ -138,7 +209,7 @@ void	collect_data_from_dir(t_init *init, char *path)
 		while ((elem = readdir(d)) != NULL)
 		{
 			join_path = ft_strjoin(path, elem->d_name);
-			read_stat(init, join_path);
+			read_stat(init, join_path, elem);
 			free(join_path);
 		}
 		closedir(d);
@@ -147,17 +218,17 @@ void	collect_data_from_dir(t_init *init, char *path)
 	{
 		printf("Can't open dir %s\n", path);
 	}
-	print_tree();
-	if (init->flag & FLAG_R)
-	{
-		list = collect_dirs_from_tree(init);
-		while (list)
-		{
-			collect_data_from_dir(init, list->data->name);
-			list = list->next;
-		}
-
-	}
+//	print_tree();
+//	if (init->flag & FLAG_R)
+//	{
+//		list = collect_dirs_from_tree(init);
+//		while (list)
+//		{
+//			collect_data_from_dir(init, list->data->name);
+//			list = list->next;
+//		}
+//
+//	}
 }
 
 void collect_elements(char **elements)
@@ -175,31 +246,31 @@ void collect_elements(char **elements)
  * текущая директория. В противном случае сначала обрабатываются и
  * выводятся все файлы из поданных на вход аргументов, а затем директории.
  */
-void	analysis_ls(t_init *init)
-{
-	t_dir_list *list;
-
-	if (!init->args_files && !init->args_dirs)
-		collect_data_from_dir(init, ".");
-	if (init->args_files)
-		collect_elements(init->args_files);
-	if (init->head)
-	{
-		print_tree();
-		free_tree();
-	}
-	if (init->args_dirs)
-	{
-		collect_elements(init->args_files);
-		list = collect_dirs_from_tree();
-		free_tree();
-		while (list)
-		{
-			collect_data_from_dir(init, list->data->name);
-			list = list->next;
-		}
-	}
-}
+//void	analysis_ls(t_init *init)
+//{
+//	t_dir_list *list;
+//
+//	if (!init->args_files && !init->args_dirs)
+//		collect_data_from_dir(init, ".");
+//	if (init->args_files)
+//		collect_elements(init->args_files);
+//	if (init->head)
+//	{
+//		print_tree();
+//		free_tree();
+//	}
+//	if (init->args_dirs)
+//	{
+//		collect_elements(init->args_dirs);
+//		list = collect_dirs_from_tree();
+//		free_tree();
+//		while (list)
+//		{
+//			collect_data_from_dir(init, list->data->name);
+//			list = list->next;
+//		}
+//	}
+//}
 
 
 
@@ -207,11 +278,14 @@ void	analysis_ls(t_init *init)
 int main(int argc, char **argv) {
 	t_init init;
 
+
 	parse_input(argc, argv, &init);
-//	test_parsing(&init);
 	absent_arguments(&init);
 	select_compare_function(&init);
 //	select_print_function(&init);
-	analysis_ls(&init);
+
+	collect_data_from_dir(&init, argv[1]);
+
+//	analysis_ls(&init);
 	return 0;
 }
