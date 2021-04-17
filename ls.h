@@ -10,7 +10,8 @@
 # include <dirent.h>
 # include <sys/xattr.h>
 # include <stdbool.h>
-
+# include <pwd.h>
+# include <grp.h>
 # include "libft/ft_printf/includes/header_pf.h"
 
 /*
@@ -19,6 +20,7 @@ FLAG_R рекурсия по папкам
 FLAG_a скрытые файлы и папки
 FLAG_r обратный порядок сортировки
 FLAG_t сортировка по времени изменения, новое сверху
+
 FLAG_u сортировка по времени последнего доступа к файлу
 FLAG_f не сортировать
 FLAG_g как l, но не выводит имя владельца
@@ -45,15 +47,23 @@ enum
 	LS_FILE,
 };
 
+#define SIX_MONTHS (1*60*60*24*30*6)
+#define MAX(a,b) ((a) >= (b)) ? (a) : (b)
 /*
- * rights[11] - drwxrwxrwx@
+ * rights[12] - drwxrwxrwx@
  */
 typedef struct s_data
 {
 	char			*name;
+	double			time;
 	char 			rights[12];
-	struct stat		*stat;
-	struct dirent	*dirent;
+	u_int32_t		blocks;
+	u_int32_t		links;
+	char			month_day[7];
+	char			time_year[6];
+	char			*user;
+	char			*group;
+	u_int64_t		size;
 	//////////////////////////
 }					t_data;
 
@@ -87,10 +97,15 @@ typedef struct s_init
 	char			**args_files;
 	char			**args_dirs;
 	int				(*comparing_func)(t_data *, t_data *);
-	void			(*print_func)(t_node *);
+	void			(*print_func)(struct s_init *, t_node *);
 	t_node			*head;
 	t_dir_list		*dir_list;
-	size_t			num_of_nodes;
+	u_int64_t		num_of_nodes;
+	u_int64_t		total_for_dir;
+	u_int64_t		max_links;
+	u_int8_t		max_user;
+	u_int8_t		max_group;
+	u_int64_t		max_size;
 }					t_init;
 
 void	parse_input(int ac, char **av, t_init *init);
@@ -105,5 +120,7 @@ void	apply_infix(t_init *init, t_node *node,
 			void (*callback_func)(t_init *, t_node *));
 void	select_print_function(t_init *init);
 void	absent_arguments(t_init *init);
+void	read_stat(t_init *init, char *path, struct dirent *elem);
+
 
 #endif

@@ -19,7 +19,20 @@ void	apply_infix(t_init *init, t_node *node, void (*callback_func)(t_init *, t_n
 	}
 }
 
+void	print_l(t_init *init, t_node *node)
+{
+	printf("%s %*u %-*s  %-*s  %*llu %s %5s %s\n", node->data->rights,
+		(u_int32_t)init->max_links, node->data->links,
+		init->max_user, node->data->user,
+		init->max_group, node->data->group,
+		(u_int32_t)init->max_size, node->data->size,
+		node->data->month_day,
+		node->data->time_year,
+		node->data->name);
+}
+
 void	select_print_function(t_init *init)
 {
-
+	if (init->flag & FLAG_l)
+		init->print_func = &print_l;
 }

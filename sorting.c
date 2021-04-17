@@ -24,7 +24,15 @@ int	sort_by_name_rev(t_data *old_data, t_data *new_data)
 }
 
 int sort_by_modification_time(t_data *old_data, t_data *new_data)
-{}
+{
+	double res;
+	res = old_data->time - new_data->time;
+	if (res > 0)
+		return (1);
+	if (res < 0)
+		return (-1);
+	return (0);
+}
 
 int sort_by_modification_time_rev(t_data *old_data, t_data *new_data)
 {
