@@ -35,12 +35,6 @@ void	fill_rights(t_data *data, mode_t mode, bool attr)
 	data->rights[11] = 0;
 }
 
-void	fill_data_rights(t_data *data, mode_t mode, bool attr)
-{
-	fill_file_type(data, mode);
-	fill_rights(data, mode, attr);
-}
-
 unsigned int module(time_t t1, time_t t2)
 {
 	long long res;
@@ -86,6 +80,33 @@ int	fill_ownership(t_init *init, t_data *data, uid_t uid, gid_t gid)
 	return (0);
 }
 
+void fill_size_major_minor(t_init *init, t_data *data, struct stat *buf)
+{
+	int mode;
+	int maj;
+	int i;
+
+	mode = buf->st_mode & S_IFMT;
+	ft_memset(data->major, ' ', 5);
+	if (mode == S_IFBLK || mode == S_IFCHR)
+	{
+		init->major = true;
+		maj = major(buf->st_rdev);
+		for (i = 3; maj; i--)
+		{
+			data->major[i] = ((maj % 10) + '0');
+			maj /= 10;
+		}
+		data->major[4] = ',';
+		data->size_minor = minor(buf->st_rdev);
+	}
+	else
+	{
+		data->size_minor = buf->st_size;
+		init->max_size = MAX(data->size_minor, init->max_size);
+	}
+}
+
 t_data *new_data(t_init *init, struct dirent *elem, struct stat *buf, bool attr)
 {
 	t_data *data;
@@ -100,7 +121,8 @@ t_data *new_data(t_init *init, struct dirent *elem, struct stat *buf, bool attr)
 	}
 	if (init->flag & FLAG_l)
 	{
-		fill_data_rights(data, buf->st_mode, attr);
+		fill_file_type(data, buf->st_mode);
+		fill_rights(data, buf->st_mode, attr);
 		data->blocks = buf->st_blocks;
 		init->total_for_dir += data->blocks;
 		data->links = buf->st_nlink;
@@ -111,8 +133,7 @@ t_data *new_data(t_init *init, struct dirent *elem, struct stat *buf, bool attr)
 			free(data);
 			return (NULL);
 		}
-		data->size = buf->st_size;
-		init->max_size = MAX(data->size, init->max_size);
+		fill_size_major_minor(init, data, buf);
 	}
 	if (init->flag & FLAG_t)
 		data->time = (double)buf->st_mtimespec.tv_sec + ((double)buf->st_mtimespec.tv_nsec / 1000000000LU);

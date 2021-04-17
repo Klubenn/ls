@@ -13,7 +13,6 @@
 # include <pwd.h>
 # include <grp.h>
 # include "libft/ft_printf/includes/header_pf.h"
-
 /*
 FLAG_l одна колонка, подробный вывод
 FLAG_R рекурсия по папкам
@@ -63,8 +62,8 @@ typedef struct s_data
 	char			time_year[6];
 	char			*user;
 	char			*group;
-	u_int64_t		size;
-	//////////////////////////
+	char			major[6];
+	u_int64_t		size_minor;
 }					t_data;
 
 typedef struct s_node
@@ -106,6 +105,7 @@ typedef struct s_init
 	u_int8_t		max_user;
 	u_int8_t		max_group;
 	u_int64_t		max_size;
+	bool			major;
 }					t_init;
 
 void	parse_input(int ac, char **av, t_init *init);

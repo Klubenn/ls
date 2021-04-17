@@ -21,11 +21,13 @@ void	apply_infix(t_init *init, t_node *node, void (*callback_func)(t_init *, t_n
 
 void	print_l(t_init *init, t_node *node)
 {
-	printf("%s %*u %-*s  %-*s  %*llu %s %5s %s\n", node->data->rights,
+	printf("%s %*u %-*s  %-*s  ", node->data->rights,
 		(u_int32_t)init->max_links, node->data->links,
 		init->max_user, node->data->user,
-		init->max_group, node->data->group,
-		(u_int32_t)init->max_size, node->data->size,
+		init->max_group, node->data->group);
+	if (init->major)
+		printf("%s", node->data->major);
+	printf("%*llu %s %5s %s\n", (u_int32_t)init->max_size, node->data->size_minor,
 		node->data->month_day,
 		node->data->time_year,
 		node->data->name);

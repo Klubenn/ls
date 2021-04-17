@@ -78,7 +78,7 @@ void	collect_data_from_dir(t_init *init, char *path)
 		closedir(d);
 
 		calculate_length_for_print(init);
-		printf("total %lu\n", init->total_for_dir);////////////
+		printf("total %llu\n", init->total_for_dir);////////////
 		apply_infix(init, init->head, init->print_func);/////////
 	}
 	else
@@ -145,6 +145,7 @@ void	null_init(t_init *init)
 	init->total_for_dir = 0;
 	init->num_of_nodes = 0;
 	init->max_links = 0;
+	init->major = false;
 }
 
 // gcc *.c  -L./libft -lft
