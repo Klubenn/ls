@@ -60,7 +60,7 @@ int parse_args(int ac, char **av, int argnum, t_init *input)
  * Парсинг флагов. На вход принимается строка. Возвращается битовая маска
  * размера 1 байт.
  */
-unsigned char parse_flags(char *str)
+unsigned char parse_flags(char *str, char *prog_name)
 {
 	unsigned char num;
 
@@ -80,7 +80,11 @@ unsigned char parse_flags(char *str)
 		else if (*str == 'f')
 			num += FLAG_f;
 		else
-			printf("Unknown flag -%c\n", *str);//todo replace with ft_printf
+		{
+			printf("%s: illegal option -- %c\n", prog_name, *str);
+			printf("usage: %s [-Ralrt] [file ...]\n", prog_name);
+			exit(1);
+		}
 		str++;
 	}
 	return (num);
@@ -94,24 +98,22 @@ unsigned char parse_flags(char *str)
 void parse_input(int ac, char **av, t_init *input)
 {
 	int				i;
-	int 			argnum;
 	int				res;
 	unsigned char   flags;
 
 	i = 0;
 	flags = 0;
-	argnum = 0;
 	res = 0;
 	while (++i < ac)
 	{
 		if (av[i][0] == '-')
-			flags = flags | parse_flags(av[i] + 1);
+			flags = flags | parse_flags(av[i] + 1, av[0]);
 		else
-			argnum++;
+			break;
 	}
 	input->flag = flags;
-	if (argnum != 0)
-		res = parse_args(ac, av, argnum, input);
+	if (i != ac)
+		res = parse_args(ac, av, ac - i, input);
 	if (res != 0)
 		myexit(input, res);
 }

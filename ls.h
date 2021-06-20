@@ -81,20 +81,28 @@ typedef struct s_dir_list
 }					t_dir_list;
 
 /*
- * flag - флаги: -lRart;
+ * flag - флаги: -lRart
+ * args_absent - не существующие файлы/директории
  * args_dirs - аргументы директории
- * args_files - остаьные аргументы (файлы)
+ * args_files - остальные аргументы (файлы)
  * comparing_func - функция сравнения, по которой будет проходить сортировка
  * print_func - функция печати
  * head - вершина бинарного дерева
  * dir_list - список директорий, по которым надо будет пройти при рекурсии
+ * num_of_nodes
+ * total_for_dir
+ * max_links
+ * max_user
+ * max_group
+ * max_size
+ * major
  */
 typedef struct s_init
 {
 	unsigned int	flag;
 	char			**args_absent;
-	char			**args_files;
 	char			**args_dirs;
+	char			**args_files;
 	int				(*comparing_func)(t_data *, t_data *);
 	void			(*print_func)(struct s_init *, t_node *);
 	t_node			*head;

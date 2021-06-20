@@ -52,6 +52,29 @@ void calculate_length_for_print(t_init *init)
 		init->max_size /= 10;
 	init->max_size = i;
 }
+
+char *join_path(char *first, char *second)
+{
+	size_t len_1;
+	size_t len_2;
+	int separator_needed;
+	char *joined_str;
+
+	separator_needed = 0;
+	len_1 = ft_strlen(first);
+	len_2 = ft_strlen(second);
+	if (first[len_1 - 1] != '/')
+		separator_needed = 1;
+	joined_str = (char *)ft_memalloc(len_1 + len_2 + 1 + separator_needed);
+	if (!joined_str)
+		return(NULL);
+	ft_memcpy(joined_str, first, len_1);
+	if (separator_needed)
+		joined_str[len_1] = '/';
+	ft_memcpy(joined_str + len_1 + separator_needed, second, len_2);
+	return (joined_str);
+}
+
 /*
  * Здесь должны будут собираться все данные по файлу или содержимому
  * директории по заданному пути, создаваться структура дата, вставляться
@@ -62,8 +85,9 @@ void	collect_data_from_dir(t_init *init, char *path)
 	DIR *d;
 	struct dirent *elem;
 	t_dir_list *list;
-	char *join_path;
+	char *joined_path;
 
+	printf("%s\n", path);
 	if (!path)
 		return;
 	d = opendir(path);
@@ -71,9 +95,12 @@ void	collect_data_from_dir(t_init *init, char *path)
 	{
 		while ((elem = readdir(d)) != NULL)
 		{
-			join_path = ft_strjoin(path, elem->d_name);
-			read_stat(init, join_path, elem);
-			free(join_path);
+			joined_path = join_path(path, elem->d_name);
+			if (!joined_path)
+				return myexit(init, ENOMEM);
+			printf("%s\n", joined_path);
+			read_stat(init, joined_path, elem);
+			free(joined_path);
 		}
 		closedir(d);
 
@@ -152,7 +179,8 @@ void	null_init(t_init *init)
 int main(int argc, char **argv) {
 	t_init init;
 
-	null_init(&init);
+	ft_memset(&init, 0, sizeof(t_init));
+//	null_init(&init);
 	parse_input(argc, argv, &init);
 	absent_arguments(&init);
 	select_compare_function(&init);

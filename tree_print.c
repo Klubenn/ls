@@ -33,8 +33,14 @@ void	print_l(t_init *init, t_node *node)
 		node->data->name);
 }
 
+void	print_1(t_init *init, t_node *node)
+{
+	printf("%s\n", node->data->name);
+}
+
 void	select_print_function(t_init *init)
 {
+	init->print_func = &print_1;
 	if (init->flag & FLAG_l)
 		init->print_func = &print_l;
 }
