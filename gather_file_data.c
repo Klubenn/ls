@@ -107,14 +107,14 @@ void fill_size_major_minor(t_init *init, t_data *data, struct stat *buf)
 	}
 }
 
-t_data *new_data(t_init *init, struct dirent *elem, struct stat *buf, bool attr)
+t_data *new_data(t_init *init, char *name, struct stat *buf, bool attr)
 {
 	t_data *data;
 
 	data = (t_data *) ft_memalloc(sizeof(t_data));
 	if (!data)
 		return (NULL);
-	if (!(data->name = ft_strdup(elem->d_name)))
+	if (!(data->name = ft_strdup(name)))
 	{
 		free(data);
 		return (NULL);
@@ -158,16 +158,42 @@ bool list_attr(char *path)
 	return (attr);
 }
 
-void	read_stat(t_init *init, char *path, struct dirent *elem)
+bool    check_hidden_file(char *file)
+{
+    char *new;
+
+    if (!(new = ft_strrchr(file, '/')))
+    {
+        if (file[0] == '.')
+            return (true);
+        return (false);
+    }
+    new++;
+    if (*new == '\0')
+    {
+        new--;
+        while (new - file > 0)
+        {
+            if (*(new - 1) == '/' && *new != '/')
+                break;
+            new--;
+        }
+    }
+    if (*new == '.')
+        return (true);
+    return (false);
+}
+
+void	read_stat(t_init *init, char *path, char *name)
 {
 	struct stat buf;
 	t_data *data;
 
 	if (lstat(path, &buf) == 0)
 	{
-		if (elem->d_name[0] == '.' && !(init->flag & FLAG_a))
+		if (check_hidden_file(name) && !(init->flag & FLAG_a))
 			return;
-		data = new_data(init, elem, &buf, list_attr(path));
+		data = new_data(init, name, &buf, list_attr(path));
 		if (!data)
 			return (myexit(init, ENOMEM));
 		init->head = insert_node(init, init->head, data);

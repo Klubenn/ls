@@ -19,6 +19,18 @@ void	apply_infix(t_init *init, t_node *node, void (*callback_func)(t_init *, t_n
 	}
 }
 
+void calculate_length_for_print(t_init *init)
+{
+    int i;
+
+    for (i = 0; init->max_links; i++)
+        init->max_links /= 10;
+    init->max_links = i;
+    for (i = 0; init->max_size; i++)
+        init->max_size /= 10;
+    init->max_size = i;
+}
+
 void	print_l(t_init *init, t_node *node)
 {
 	printf("%s %*u %-*s  %-*s  ", node->data->rights,

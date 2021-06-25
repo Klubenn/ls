@@ -41,18 +41,6 @@ t_dir_list	*collect_dirs_from_tree(t_init *init)
 
 
 
-void calculate_length_for_print(t_init *init)
-{
-	int i;
-
-	for (i = 0; init->max_links; i++)
-		init->max_links /= 10;
-	init->max_links = i;
-	for (i = 0; init->max_size; i++)
-		init->max_size /= 10;
-	init->max_size = i;
-}
-
 char *join_path(char *first, char *second)
 {
 	size_t len_1;
@@ -98,7 +86,7 @@ void	collect_data_from_dir(t_init *init, char *path)
 			joined_path = join_path(path, elem->d_name);
 			if (!joined_path)
 				return myexit(init, ENOMEM);
-			read_stat(init, joined_path, elem);
+			read_stat(init, joined_path, elem->d_name);
 			free(joined_path);
 		}
 		closedir(d);
@@ -124,14 +112,26 @@ void	collect_data_from_dir(t_init *init, char *path)
 //	}
 }
 
-void collect_elements(char **elements)
+char *get_file_name(char *path)
+{
+    char *new;
+
+    if ((new = ft_strrchr(path, '/')))
+        return (new + 1);
+    return path;
+}
+
+void collect_elements(t_init *init, char **elements)
 {
 	while (*elements)
 	{
+        read_stat(init, *elements, *elements);
 		// сбор данных по файлу/директории
 		// отправка данных в дерево
 		elements++;
 	}
+    calculate_length_for_print(init);
+    apply_infix(init, init->head, init->print_func);/////////
 }
 
 /*
@@ -146,7 +146,7 @@ void	analysis_ls(t_init *init)
 	if (!init->args_files && !init->args_dirs)
 		collect_data_from_dir(init, ".");
 	else if (init->args_files)
-		collect_elements(init->args_files);
+		collect_elements(init, init->args_files);
 //	if (init->head)
 //	{
 //		print_tree();
@@ -179,3 +179,10 @@ int main(int argc, char **argv) {
 
     write(1, "-\n", 2);
 }
+
+/*
+ls: /Users/gtristan/.CFUserTextEncoding/: Not a directory
+ft_ls: /Users/gtristan/.CFUserTextEncoding/: No such file or directory
+
+
+*/

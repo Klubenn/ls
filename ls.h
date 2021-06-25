@@ -128,7 +128,7 @@ void	apply_infix(t_init *init, t_node *node,
 			void (*callback_func)(t_init *, t_node *));
 void	select_print_function(t_init *init);
 void	absent_arguments(t_init *init);
-void	read_stat(t_init *init, char *path, struct dirent *elem);
-
+void	read_stat(t_init *init, char *path, char *name);
+void    calculate_length_for_print(t_init *init);
 
 #endif
