@@ -50,7 +50,9 @@ static void print_absent_arguments(char **args)
 
 void	absent_arguments(t_init *init)
 {
-	if ((init->flag & FLAG_f) == 0)
+    if (!init->args_absent)
+        return;
+    if ((init->flag & FLAG_f) == 0)
 		sort_absent_arguments(init->args_absent, length(init->args_absent));
 	print_absent_arguments(init->args_absent);
 }

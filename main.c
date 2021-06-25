@@ -98,7 +98,6 @@ void	collect_data_from_dir(t_init *init, char *path)
 			joined_path = join_path(path, elem->d_name);
 			if (!joined_path)
 				return myexit(init, ENOMEM);
-			printf("%s\n", joined_path);
 			read_stat(init, joined_path, elem);
 			free(joined_path);
 		}
@@ -140,14 +139,14 @@ void collect_elements(char **elements)
  * текущая директория. В противном случае сначала обрабатываются и
  * выводятся все файлы из поданных на вход аргументов, а затем директории.
  */
-//void	analysis_ls(t_init *init)
-//{
-//	t_dir_list *list;
-//
-//	if (!init->args_files && !init->args_dirs)
-//		collect_data_from_dir(init, ".");
-//	if (init->args_files)
-//		collect_elements(init->args_files);
+void	analysis_ls(t_init *init)
+{
+	t_dir_list *list;
+
+	if (!init->args_files && !init->args_dirs)
+		collect_data_from_dir(init, ".");
+	else if (init->args_files)
+		collect_elements(init->args_files);
 //	if (init->head)
 //	{
 //		print_tree();
@@ -164,15 +163,6 @@ void collect_elements(char **elements)
 //			list = list->next;
 //		}
 //	}
-//}
-
-void	null_init(t_init *init)
-{
-	init->head = NULL;
-	init->total_for_dir = 0;
-	init->num_of_nodes = 0;
-	init->max_links = 0;
-	init->major = false;
 }
 
 // gcc *.c  -L./libft -lft
@@ -180,14 +170,12 @@ int main(int argc, char **argv) {
 	t_init init;
 
 	ft_memset(&init, 0, sizeof(t_init));
-//	null_init(&init);
 	parse_input(argc, argv, &init);
 	absent_arguments(&init);
 	select_compare_function(&init);
 	select_print_function(&init);
-
-	collect_data_from_dir(&init, argv[1]);
-
-//	analysis_ls(&init);
+	analysis_ls(&init);
 	return 0;
+
+    write(1, "-\n", 2);
 }
