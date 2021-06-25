@@ -98,6 +98,19 @@ void	collect_data_from_dir(t_init *init, char *path, bool print_path)
     }
 }
 
+void    null_init_data(t_init *init)
+{
+    init->head = NULL;
+    init->dir_list = NULL;
+    init->dir_list_last_elem = NULL;
+    init->num_of_nodes = 0;
+    init->total_for_dir = 0;
+    init->max_links = 0;
+    init->max_user = 0;
+    init->max_group = 0;
+    init->max_size = 0;
+}
+
 /*
  * Обход списков директорий
  */
@@ -108,8 +121,7 @@ void    process_directories(t_init *init, bool print_path)
 
     dir_list = collect_dirs_from_tree(init);
     free_tree(init->head);
-    init->head = NULL;
-    init->dir_list = NULL;
+    null_init_data(init);
     while(dir_list)
     {
         if (init->print_line)
@@ -184,5 +196,17 @@ int main(int argc, char **argv) {
 ls: /Users/gtristan/.CFUserTextEncoding/: Not a directory
 ft_ls: /Users/gtristan/.CFUserTextEncoding/: No such file or directory
 
+________________
 
+mi-e5% ./ft_ls -lR
+total 208
+-rw-r--r--   1 gtristan  student    666 Jun 25 12:08 CMakeLists.txt
+-rw-r--r--   1 gtristan  student    284 Jun 25 12:08 Makefile
+-rw-r--r--   1 gtristan  student  14266 Apr 16 16:20 README.md
+
+mi-e5% ls -lR
+total 200
+-rw-r--r--   1 gtristan  student    666 Jun 25 12:08 CMakeLists.txt
+-rw-r--r--   1 gtristan  student    284 Jun 25 12:08 Makefile
+-rw-r--r--   1 gtristan  student  14266 Apr 16 16:20 README.md
 */
