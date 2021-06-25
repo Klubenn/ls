@@ -1,46 +1,46 @@
 #include "ls.h"
 
-
-
-
-t_data *copy_t_data(t_data *data)
-{
-	t_data *new;
-
-	new = (t_data *)ft_memalloc(sizeof(t_data));
-	///
-}
-
 /*
- * Эти 2 функции нужны для рекурсивного обхода директорий
+ * Сохранение директорий в список
  */
 void	add_element_to_dir_list(t_init *init, t_node *node)
 {
 	t_dir_list *current_dir;
 
-//	if (!node->data->)//todo добавить проверку на директорию
-//		return;
+    if (node->data->rights[0] != 'd')
+		return;
 	current_dir = (t_dir_list *)ft_memalloc(sizeof(t_dir_list));
 	if (!current_dir)
 		return (myexit(init, ENOMEM));
-	current_dir->next = init->dir_list;
-	init->dir_list = current_dir;
-	current_dir->data = copy_t_data(node->data);
-	if (!current_dir->data)
+	if (!init->dir_list)
+    {
+        init->dir_list = current_dir;
+        init->dir_list_last_elem = current_dir;
+    }
+	else
+    {
+        init->dir_list_last_elem->next = current_dir;
+        init->dir_list_last_elem = init->dir_list_last_elem->next;
+    }
+	current_dir->path = ft_strdup(node->data->path);
+	if (!current_dir->path)
 		return (myexit(init, ENOMEM));
 }
 
 /*
- * обход текущего дерева для сбора директорий для рекурсии
+ * обход текущего дерева для сбора директорий в список, возвращается указатель
+ * на начало списка
  */
 t_dir_list	*collect_dirs_from_tree(t_init *init)
 {
 	apply_infix(init, init->head, &add_element_to_dir_list);
-	///
+    return (init->dir_list);
 }
 
 
-
+/*
+ * Соединение пути директории с именем файла и добавление разделителя '/' при необходимости
+ */
 char *join_path(char *first, char *second)
 {
 	size_t len_1;
@@ -64,18 +64,15 @@ char *join_path(char *first, char *second)
 }
 
 /*
- * Здесь должны будут собираться все данные по файлу или содержимому
- * директории по заданному пути, создаваться структура дата, вставляться
- * в дерево. Принимает на вход начальную структуру и путь.
+ * Сбор содержимого директории по заданному пути, печать результата, дальнейший
+ * обход при рекурсии.
  */
-void	collect_data_from_dir(t_init *init, char *path)
+void	collect_data_from_dir(t_init *init, char *path, bool print_path)
 {
 	DIR *d;
 	struct dirent *elem;
-	t_dir_list *list;
 	char *joined_path;
 
-	printf("%s\n", path);
 	if (!path)
 		return;
 	d = opendir(path);
@@ -86,52 +83,66 @@ void	collect_data_from_dir(t_init *init, char *path)
 			joined_path = join_path(path, elem->d_name);
 			if (!joined_path)
 				return myexit(init, ENOMEM);
-			read_stat(init, joined_path, elem->d_name);
+			read_stat(init, joined_path, elem->d_name, false);
 			free(joined_path);
 		}
 		closedir(d);
-
-		calculate_length_for_print(init);
-		printf("total %llu\n", init->total_for_dir);////////////
-		apply_infix(init, init->head, init->print_func);/////////
+        print_dir(init, path, print_path);
 	}
 	else
-	{
 		printf("Can't open dir %s\n", path);
-	}
-//	print_tree();
-//	if (init->flag & FLAG_R)
-//	{
-//		list = collect_dirs_from_tree(init);
-//		while (list)
-//		{
-//			collect_data_from_dir(init, list->data->name);
-//			list = list->next;
-//		}
-//
-//	}
+	if (init->flag & FLAG_R)
+    {
+        init->print_line = true;
+	    process_directories(init, true);
+    }
 }
 
-char *get_file_name(char *path)
+/*
+ * Обход списков директорий
+ */
+void    process_directories(t_init *init, bool print_path)
 {
-    char *new;
+    t_dir_list *dir_list;
+    t_dir_list *prev_dir;
 
-    if ((new = ft_strrchr(path, '/')))
-        return (new + 1);
-    return path;
+    dir_list = collect_dirs_from_tree(init);
+    free_tree(init->head);
+    init->head = NULL;
+    init->dir_list = NULL;
+    while(dir_list)
+    {
+        if (init->print_line)
+            write(1, "\n", 1);
+        prev_dir = dir_list;
+        collect_data_from_dir(init, dir_list->path, print_path);
+        dir_list = dir_list->next;
+        free(prev_dir);
+    }
 }
-
-void collect_elements(t_init *init, char **elements)
+/*
+ * Последовательнный анализ файлов или директорий
+ */
+void collect_elements(t_init *init, char **elements, bool files)
 {
+    int dirnum;
+
+    dirnum = 0;
 	while (*elements)
 	{
-        read_stat(init, *elements, *elements);
-		// сбор данных по файлу/директории
-		// отправка данных в дерево
+        read_stat(init, *elements, *elements, true);
 		elements++;
+		dirnum++;
 	}
-    calculate_length_for_print(init);
-    apply_infix(init, init->head, init->print_func);/////////
+	if (files)
+    {
+        calculate_length_for_print(init);
+        apply_infix(init, init->head, init->print_func);
+        free_tree(init->head);
+        init->head = NULL;
+    }
+	else
+	    process_directories(init, dirnum != 1);
 }
 
 /*
@@ -139,30 +150,19 @@ void collect_elements(t_init *init, char **elements)
  * текущая директория. В противном случае сначала обрабатываются и
  * выводятся все файлы из поданных на вход аргументов, а затем директории.
  */
-void	analysis_ls(t_init *init)
+void	select_data_for_analysis(t_init *init)
 {
-	t_dir_list *list;
+    bool print_line = false;
 
 	if (!init->args_files && !init->args_dirs)
-		collect_data_from_dir(init, ".");
-	else if (init->args_files)
-		collect_elements(init, init->args_files);
-//	if (init->head)
-//	{
-//		print_tree();
-//		free_tree();
-//	}
-//	if (init->args_dirs)
-//	{
-//		collect_elements(init->args_dirs);
-//		list = collect_dirs_from_tree();
-//		free_tree();
-//		while (list)
-//		{
-//			collect_data_from_dir(init, list->data->name);
-//			list = list->next;
-//		}
-//	}
+		collect_data_from_dir(init, ".", false);
+    if (init->args_files)
+    {
+        collect_elements(init, init->args_files, true);
+        init->print_line = true;
+    }
+    if (init->args_dirs)
+        collect_elements(init, init->args_dirs, false);
 }
 
 // gcc *.c  -L./libft -lft
@@ -174,7 +174,7 @@ int main(int argc, char **argv) {
 	absent_arguments(&init);
 	select_compare_function(&init);
 	select_print_function(&init);
-	analysis_ls(&init);
+    select_data_for_analysis(&init);
 	return 0;
 
     write(1, "-\n", 2);

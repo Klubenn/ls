@@ -54,6 +54,7 @@ enum
 typedef struct s_data
 {
 	char			*name;
+	char			*path;
 	double			time;
 	char 			rights[12];
 	u_int32_t		blocks;
@@ -76,7 +77,7 @@ typedef struct s_node
 
 typedef struct s_dir_list
 {
-	t_data				*data;
+	char				*path;
 	struct s_dir_list	*next;
 }					t_dir_list;
 
@@ -107,6 +108,7 @@ typedef struct s_init
 	void			(*print_func)(struct s_init *, t_node *);
 	t_node			*head;
 	t_dir_list		*dir_list;
+	t_dir_list		*dir_list_last_elem;
 	u_int64_t		num_of_nodes;
 	u_int64_t		total_for_dir;
 	u_int64_t		max_links;
@@ -114,6 +116,7 @@ typedef struct s_init
 	u_int8_t		max_group;
 	u_int64_t		max_size;
 	bool			major;
+	bool            print_line;
 }					t_init;
 
 void	parse_input(int ac, char **av, t_init *init);
@@ -128,7 +131,9 @@ void	apply_infix(t_init *init, t_node *node,
 			void (*callback_func)(t_init *, t_node *));
 void	select_print_function(t_init *init);
 void	absent_arguments(t_init *init);
-void	read_stat(t_init *init, char *path, char *name);
+void	read_stat(t_init *init, char *path, char *name, bool show_local_dir);
 void    calculate_length_for_print(t_init *init);
+void    process_directories(t_init *init, bool print_path);
+void    print_dir(t_init *init, char *path, bool print_path);
 
 #endif

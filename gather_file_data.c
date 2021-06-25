@@ -54,7 +54,6 @@ void	fill_time(t_data *data, struct timespec time_file)
 	time_now = time(NULL);
 	over_six_months = module(time_now, time_file.tv_sec) > SIX_MONTHS ? true : false;
 	t = ctime(&(time_file.tv_sec));
-	printf("%s\n", t);
 	ft_strncpy(data->month_day, ft_strchr(t, ' ') + 1, 6);
 	if (over_six_months)
 		ft_strncpy(data->time_year, ft_strrchr(t, ' ') + 1, 4);
@@ -107,7 +106,7 @@ void fill_size_major_minor(t_init *init, t_data *data, struct stat *buf)
 	}
 }
 
-t_data *new_data(t_init *init, char *name, struct stat *buf, bool attr)
+t_data *new_data(t_init *init, char *path, char *name, struct stat *buf, bool attr)
 {
 	t_data *data;
 
@@ -119,9 +118,15 @@ t_data *new_data(t_init *init, char *name, struct stat *buf, bool attr)
 		free(data);
 		return (NULL);
 	}
+	if (!(data->path = ft_strdup(path)))
+    {
+	    free(data->name);
+        free(data);
+        return (NULL);
+    }
+    fill_file_type(data, buf->st_mode);
 	if (init->flag & FLAG_l)
 	{
-		fill_file_type(data, buf->st_mode);
 		fill_rights(data, buf->st_mode, attr);
 		data->blocks = buf->st_blocks;
 		init->total_for_dir += data->blocks;
@@ -184,16 +189,16 @@ bool    check_hidden_file(char *file)
     return (false);
 }
 
-void	read_stat(t_init *init, char *path, char *name)
+void	read_stat(t_init *init, char *path, char *name, bool show_local_dir)
 {
 	struct stat buf;
 	t_data *data;
 
 	if (lstat(path, &buf) == 0)
 	{
-		if (check_hidden_file(name) && !(init->flag & FLAG_a))
+		if (!show_local_dir && check_hidden_file(name) && !(init->flag & FLAG_a))
 			return;
-		data = new_data(init, name, &buf, list_attr(path));
+		data = new_data(init, path, name, &buf, list_attr(path));
 		if (!data)
 			return (myexit(init, ENOMEM));
 		init->head = insert_node(init, init->head, data);

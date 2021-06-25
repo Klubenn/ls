@@ -1,9 +1,10 @@
 #include "ls.h"
 
 /*
- * Вывод дерева на печать обходом слева направо. Принимает (локальную)
+ * Вызов callback функции при обходе дерева слева направо. Сюда может быть
+ * передана ф-ция вывода на печать, поиска директорий. Принимает (локальную)
  * вершину дерева и идёт максимально влево, печатает левый элемент, затем
- * центральный и после этого правый. Принимает также функцию печати.
+ * центральный и после этого правый.
  */
 void	apply_infix(t_init *init, t_node *node, void (*callback_func)(t_init *, t_node *))
 {
@@ -11,7 +12,7 @@ void	apply_infix(t_init *init, t_node *node, void (*callback_func)(t_init *, t_n
 		return ;
 	else
 	{
-		if (node->left)
+        if (node->left)
 			apply_infix(init, node->left, callback_func);
 		callback_func(init, node);
 		if (node->right)
@@ -19,6 +20,9 @@ void	apply_infix(t_init *init, t_node *node, void (*callback_func)(t_init *, t_n
 	}
 }
 
+/*
+ * подсчёт размеров полей для ссылок и размера файла для ровного отступа при выводе на печать
+ */
 void calculate_length_for_print(t_init *init)
 {
     int i;
@@ -31,6 +35,9 @@ void calculate_length_for_print(t_init *init)
     init->max_size = i;
 }
 
+/*
+ * подробная печать
+ */
 void	print_l(t_init *init, t_node *node)
 {
 	printf("%s %*u %-*s  %-*s  ", node->data->rights,
@@ -45,11 +52,27 @@ void	print_l(t_init *init, t_node *node)
 		node->data->name);
 }
 
+/*
+ * краткая печать в столбик
+ */
 void	print_1(t_init *init, t_node *node)
 {
 	printf("%s\n", node->data->name);
 }
 
+void    print_dir(t_init *init, char *path, bool print_path)
+{
+    calculate_length_for_print(init);
+    if (print_path)
+        printf("%s\n", path);
+    if (init->flag & FLAG_l)
+        printf("total %llu\n", init->total_for_dir);
+    apply_infix(init, init->head, init->print_func);
+}
+
+/*
+ * выбор функции вывода на печать
+ */
 void	select_print_function(t_init *init)
 {
 	init->print_func = &print_1;
