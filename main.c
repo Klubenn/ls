@@ -131,6 +131,7 @@ void    process_directories(t_init *init, bool print_path)
         prev_dir = dir_list;
         collect_data_from_dir(init, dir_list->path, print_path);
         dir_list = dir_list->next;
+        free(prev_dir->path);
         free(prev_dir);
     }
 }
@@ -190,5 +191,6 @@ int main(int argc, char **argv) {
 	select_compare_function(&init);
 	select_print_function(&init);
     select_data_for_analysis(&init);
-    myexit(&init, 0);
+    free_args(&init);
+    return (0);
 }

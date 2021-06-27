@@ -142,5 +142,6 @@ void    print_dir(t_init *init, char *path, bool print_path);
 void	add_element_to_dir_list(t_init *init, t_node *node);
 void	*free_data(t_data *data);
 void	free_dir_list(t_init *init);
+void	free_args(t_init *init);
 
 #endif

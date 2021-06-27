@@ -43,18 +43,26 @@ void	free_dir_list(t_init *init)
 	{
 		prev_dir = dir_list;
 		dir_list = dir_list->next;
+		free(prev_dir->path);
 		free(prev_dir);
 	}
+}
+
+void	free_args(t_init *init)
+{
+	if (init->args_files)
+		free(init->args_files);
+	if (init->args_dirs)
+		free(init->args_dirs);
+	if (init->args_absent)
+		free(init->args_absent);
 }
 
 void	myexit(t_init *init, int err)
 {
 	if (init)
 	{
-		if (init->args_files)
-			free(init->args_files);
-		if (init->args_dirs)
-			free(init->args_dirs);
+		free_args(init);
 		if (init->head)
 			free_tree(init->head);
 	}
