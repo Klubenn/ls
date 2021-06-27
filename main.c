@@ -88,6 +88,9 @@ void	collect_data_from_dir(t_init *init, char *path, bool print_path)
 		}
 		closedir(d);
         print_dir(init, path, print_path);
+        free_tree(init->head);
+        if (!(init->flag & FLAG_R))
+            free_dir_list(init);
 	}
 	else
 		printf("Can't open dir %s\n", path);
@@ -119,13 +122,12 @@ void    process_directories(t_init *init, bool print_path)
     t_dir_list *dir_list;
     t_dir_list *prev_dir;
 
-    dir_list = collect_dirs_from_tree(init);
-    free_tree(init->head);
+    dir_list = init->dir_list;
     null_init_data(init);
     while(dir_list)
     {
         if (init->print_line)
-            write(1, "\n", 1);
+            printf("\n");
         prev_dir = dir_list;
         collect_data_from_dir(init, dir_list->path, print_path);
         dir_list = dir_list->next;
@@ -154,7 +156,11 @@ void collect_elements(t_init *init, char **elements, bool files)
         init->head = NULL;
     }
 	else
-	    process_directories(init, dirnum != 1);
+    {
+        collect_dirs_from_tree(init);
+        free_tree(init->head);
+        process_directories(init, dirnum != 1);
+    }
 }
 
 /*
@@ -164,8 +170,6 @@ void collect_elements(t_init *init, char **elements, bool files)
  */
 void	select_data_for_analysis(t_init *init)
 {
-    bool print_line = false;
-
 	if (!init->args_files && !init->args_dirs)
 		collect_data_from_dir(init, ".", false);
     if (init->args_files)
@@ -177,7 +181,6 @@ void	select_data_for_analysis(t_init *init)
         collect_elements(init, init->args_dirs, false);
 }
 
-// gcc *.c  -L./libft -lft
 int main(int argc, char **argv) {
 	t_init init;
 
@@ -187,26 +190,5 @@ int main(int argc, char **argv) {
 	select_compare_function(&init);
 	select_print_function(&init);
     select_data_for_analysis(&init);
-	return 0;
-
-    write(1, "-\n", 2);
+    myexit(&init, 0);
 }
-
-/*
-ls: /Users/gtristan/.CFUserTextEncoding/: Not a directory
-ft_ls: /Users/gtristan/.CFUserTextEncoding/: No such file or directory
-
-________________
-
-mi-e5% ./ft_ls -lR
-total 208
--rw-r--r--   1 gtristan  student    666 Jun 25 12:08 CMakeLists.txt
--rw-r--r--   1 gtristan  student    284 Jun 25 12:08 Makefile
--rw-r--r--   1 gtristan  student  14266 Apr 16 16:20 README.md
-
-mi-e5% ls -lR
-total 200
--rw-r--r--   1 gtristan  student    666 Jun 25 12:08 CMakeLists.txt
--rw-r--r--   1 gtristan  student    284 Jun 25 12:08 Makefile
--rw-r--r--   1 gtristan  student  14266 Apr 16 16:20 README.md
-*/

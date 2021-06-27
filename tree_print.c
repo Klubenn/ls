@@ -15,6 +15,9 @@ void	apply_infix(t_init *init, t_node *node, void (*callback_func)(t_init *, t_n
         if (node->left)
 			apply_infix(init, node->left, callback_func);
 		callback_func(init, node);
+		if (init->flag & FLAG_R)
+            add_element_to_dir_list(init, node);
+
 		if (node->right)
 			apply_infix(init, node->right, callback_func);
 	}
@@ -46,10 +49,13 @@ void	print_l(t_init *init, t_node *node)
 		init->max_group, node->data->group);
 	if (init->major)
 		printf("%s", node->data->major);
-	printf("%*llu %s %5s %s\n", (u_int32_t)init->max_size, node->data->size_minor,
+	printf("%*llu %s %5s %s", (u_int32_t)init->max_size, node->data->size_minor,
 		node->data->month_day,
 		node->data->time_year,
 		node->data->name);
+	if (node->data->link_to_file)
+        printf(" -> %s", node->data->link_to_file);
+    printf("\n");
 }
 
 /*
@@ -64,8 +70,8 @@ void    print_dir(t_init *init, char *path, bool print_path)
 {
     calculate_length_for_print(init);
     if (print_path)
-        printf("%s\n", path);
-    if (init->flag & FLAG_l)
+        printf("%s:\n", path);
+    if (init->flag & FLAG_l && init->head)
         printf("total %llu\n", init->total_for_dir);
     apply_infix(init, init->head, init->print_func);
 }

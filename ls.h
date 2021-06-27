@@ -48,6 +48,7 @@ enum
 
 #define SIX_MONTHS (1*60*60*24*30*6)
 #define MAX(a,b) ((a) >= (b)) ? (a) : (b)
+#define MAX_FILE_PATH_LEN 4096
 /*
  * rights[12] - drwxrwxrwx@
  */
@@ -55,6 +56,7 @@ typedef struct s_data
 {
 	char			*name;
 	char			*path;
+	char            *link_to_file;
 	double			time;
 	char 			rights[12];
 	u_int32_t		blocks;
@@ -90,13 +92,15 @@ typedef struct s_dir_list
  * print_func - функция печати
  * head - вершина бинарного дерева
  * dir_list - список директорий, по которым надо будет пройти при рекурсии
- * num_of_nodes
+ * dir_list_last_elem - последний элемент в списке директорий
+ * num_of_nodes - число нод в дереве
  * total_for_dir
- * max_links
- * max_user
- * max_group
- * max_size
+ * max_links - максимальное кол-во / разрядность ссылок
+ * max_user - максимальный номер / разрядность пользователя
+ * max_group - максимальный номер / разрядность группы
+ * max_size - максимальный размер / разрядность файла
  * major
+ * print_line
  */
 typedef struct s_init
 {
@@ -125,7 +129,7 @@ t_node	*balance(t_node *node);
 int		sort_by_name(t_data *old_data, t_data *new_data);
 int		sort_by_name_rev(t_data *old_data, t_data *new_data);
 t_node	*insert_node(t_init *init, t_node *node, t_data *data);
-void	myexit(t_init *input, int err);
+void	myexit(t_init *init, int err);
 void	free_tree(t_node *node);
 void	apply_infix(t_init *init, t_node *node,
 			void (*callback_func)(t_init *, t_node *));
@@ -135,5 +139,8 @@ void	read_stat(t_init *init, char *path, char *name, bool show_local_dir);
 void    calculate_length_for_print(t_init *init);
 void    process_directories(t_init *init, bool print_path);
 void    print_dir(t_init *init, char *path, bool print_path);
+void	add_element_to_dir_list(t_init *init, t_node *node);
+void	*free_data(t_data *data);
+void	free_dir_list(t_init *init);
 
 #endif

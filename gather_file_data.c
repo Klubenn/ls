@@ -91,13 +91,18 @@ void fill_size_major_minor(t_init *init, t_data *data, struct stat *buf)
 	{
 		init->major = true;
 		maj = major(buf->st_rdev);
-		for (i = 3; maj; i--)
-		{
-			data->major[i] = ((maj % 10) + '0');
-			maj /= 10;
-		}
+        if (maj == 0)
+            data->major[3] = '0';
+        else
+        {
+            for (i = 3; maj; i--) {
+                data->major[i] = ((maj % 10) + '0');
+                maj /= 10;
+            }
+        }
 		data->major[4] = ',';
 		data->size_minor = minor(buf->st_rdev);
+        init->max_size = MAX(data->size_minor, init->max_size);
 	}
 	else
 	{
@@ -105,6 +110,21 @@ void fill_size_major_minor(t_init *init, t_data *data, struct stat *buf)
 		init->max_size = MAX(data->size_minor, init->max_size);
 	}
 }
+
+int    fill_link_to_file(t_data *data, char *path)
+{
+    char buf[MAX_FILE_PATH_LEN];
+
+    ft_memset(buf, 0, MAX_FILE_PATH_LEN);
+    if (readlink(path, buf, MAX_FILE_PATH_LEN) != -1)
+    {
+        if (!(data->link_to_file = ft_strndup(buf, MAX_FILE_PATH_LEN)))
+            return (ENOMEM);
+        return (0);
+    }
+    return (errno);
+}
+
 
 t_data *new_data(t_init *init, char *path, char *name, struct stat *buf, bool attr)
 {
@@ -114,16 +134,9 @@ t_data *new_data(t_init *init, char *path, char *name, struct stat *buf, bool at
 	if (!data)
 		return (NULL);
 	if (!(data->name = ft_strdup(name)))
-	{
-		free(data);
-		return (NULL);
-	}
+        return free_data(data);
 	if (!(data->path = ft_strdup(path)))
-    {
-	    free(data->name);
-        free(data);
-        return (NULL);
-    }
+        return free_data(data);
     fill_file_type(data, buf->st_mode);
 	if (init->flag & FLAG_l)
 	{
@@ -134,15 +147,14 @@ t_data *new_data(t_init *init, char *path, char *name, struct stat *buf, bool at
 		init->max_links = (init->max_links >= data->links)? init->max_links : data->links;
 		fill_time(data, buf->st_mtimespec);
 		if (fill_ownership(init, data, buf->st_uid, buf->st_gid) != 0)
-		{
-			free(data);
-			return (NULL);
-		}
+            return free_data(data);
 		fill_size_major_minor(init, data, buf);
+		if (data->rights[0] == 'l')
+		    if (fill_link_to_file(data, path) != 0)
+                return free_data(data);
 	}
 	if (init->flag & FLAG_t)
 		data->time = (double)buf->st_mtimespec.tv_sec + ((double)buf->st_mtimespec.tv_nsec / 1000000000LU);
-
 
 
 
@@ -159,6 +171,11 @@ bool list_attr(char *path)
 	errno = 0;
 	if (listxattr(path, NULL, 0, XATTR_NOFOLLOW) && errno == 0)
 		attr = true;
+
+//	char namebuf[1024] = {0};
+//	size_t size = listxattr(path, namebuf, 1024, XATTR_NOFOLLOW);
+//	printf("%zu *** %s ***---\n", size, namebuf);
+
 	errno = 0;
 	return (attr);
 }
@@ -200,7 +217,7 @@ void	read_stat(t_init *init, char *path, char *name, bool show_local_dir)
 			return;
 		data = new_data(init, path, name, &buf, list_attr(path));
 		if (!data)
-			return (myexit(init, ENOMEM));
+			return (myexit(init, errno));
 		init->head = insert_node(init, init->head, data);
 		init->num_of_nodes += 1;
 	}

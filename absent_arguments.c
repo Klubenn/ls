@@ -39,11 +39,24 @@ static void	sort_absent_arguments(char **args, int len)
 static void print_absent_arguments(char **args)
 {
 	int i;
+	size_t j;
+	struct stat buf;
+	char str[MAX_FILE_PATH_LEN];
 
 	i = 0;
 	while(args[i])
 	{
-		printf("ft_ls: %s: No such file or directory\n", args[i]);
+		j = ft_strlen(args[i]);
+		if (args[i][j-1] == '/')
+		{
+			ft_memcpy(str, args[i], j + 1);
+			while (--j >= 0 && str[j] == '/')
+				str[j] = 0;
+			if (stat(str, &buf) == 0)
+				printf("ft_ls: %s: Not a directory\n", args[i]);
+		}
+		else
+			printf("ft_ls: %s: No such file or directory\n", args[i]);
 		i++;
 	}
 }
