@@ -62,7 +62,7 @@ typedef struct s_data
 	u_int32_t		blocks;
 	u_int32_t		links;
 	char			month_day[7];
-	char			time_year[6];
+	char			time_year[7];
 	char			*user;
 	char			*group;
 	char			major[6];

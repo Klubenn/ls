@@ -1,5 +1,17 @@
 #include "../includes/ls.h"
 
+bool    check_dot_dirs(char *path)
+{
+    char *new;
+
+    if (!(new = ft_strrchr(path, '/')))
+        new = path;
+    if (ft_strcmp(".", new) == 0 || ft_strcmp("..", new) == 0)
+        return (true);
+    return false;
+
+}
+
 /*
  * Вызов callback функции при обходе дерева слева направо. Сюда может быть
  * передана ф-ция вывода на печать, поиска директорий. Принимает (локальную)
@@ -16,7 +28,7 @@ void	apply_infix(t_init *init, t_node *node, void (*callback_func)(t_init *, t_n
 			apply_infix(init, node->left, callback_func);
         if (callback_func)
 		    callback_func(init, node);
-		if (init->flag & FLAG_R)
+		if (init->flag & FLAG_R && !check_dot_dirs(node->data->name))
             add_element_to_dir_list(init, node);
 
 		if (node->right)

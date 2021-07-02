@@ -33,7 +33,10 @@ void	add_element_to_dir_list(t_init *init, t_node *node)
  */
 t_dir_list	*collect_dirs_from_tree(t_init *init)
 {
-	apply_infix(init, init->head, NULL);
+    void *callback_func;
+
+    callback_func = (init->flag & FLAG_R)? NULL : &(add_element_to_dir_list);
+	apply_infix(init, init->head, callback_func);
     return (init->dir_list);
 }
 
@@ -99,8 +102,6 @@ void	collect_data_from_dir(t_init *init, char *path)
         print_dir(init, path);
         free_tree(init->head);
         init->head = NULL;
-//        if (!(init->flag & FLAG_R))
-//            free_dir_list(init);
 	}
 	else
     {
@@ -110,6 +111,7 @@ void	collect_data_from_dir(t_init *init, char *path)
     }
 	if (init->flag & FLAG_R)
     {
+	    init->print_path = true;
         init->print_line = true;
 	    process_directories(init);
     }
@@ -202,6 +204,7 @@ void	select_data_for_analysis(t_init *init)
 int main(int argc, char **argv) {
 	t_init init;
 
+    fd_printf(2, "123%s***\n", argv[0]);
 	ft_memset(&init, 0, sizeof(t_init));
 	init.prog_name = argv[0];
 	parse_input(argc, argv, &init);

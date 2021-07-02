@@ -55,8 +55,9 @@ void	fill_time(t_data *data, struct timespec time_file)
 	over_six_months = module(time_now, time_file.tv_sec) > SIX_MONTHS ? true : false;
 	t = ctime(&(time_file.tv_sec));
 	ft_strncpy(data->month_day, ft_strchr(t, ' ') + 1, 6);
+	t[ft_strlen(t) - 1] = '\0';
 	if (over_six_months)
-		ft_strncpy(data->time_year, ft_strrchr(t, ' ') + 1, 4);
+	    ft_strcpy(data->time_year, ft_strrchr(t, ' '));
 	else
 		ft_strncpy(data->time_year, ft_strchr(t, ':') - 2, 5);
 }

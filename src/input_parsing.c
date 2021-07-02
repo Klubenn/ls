@@ -40,9 +40,10 @@ int parse_args(int ac, char **av, int argnum, t_init *input)
 	dir = -1;
 	file = -1;
 	abs = -1;
-	while (--ac > 0 && ++av)
+	av += ac - argnum - 1;
+	while (--argnum >= 0 && ++av)
 	{
-		if (*av && (*av[0] != '-' || ft_strcmp(*av, "-") == 0))
+		if (*av)
 		{
 			res = dir_or_file(*av);
 			if (res == LS_NOSUCHFILE)
@@ -111,11 +112,14 @@ void parse_input(int ac, char **av, t_init *input)
 		if (av[i][0] == '-' && ft_strcmp(av[i], "-") != 0)
         {
 		    if (ft_strcmp("--", av[i]) == 0)
-		        continue;
+            {
+		        i++;
+		        break;
+            }
 		    flags = flags | parse_flags(av[i] + 1, av[0]);
         }
 		else
-			break;
+		    break;
 	}
 	input->flag = flags;
 	if (i != ac)
