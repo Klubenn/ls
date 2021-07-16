@@ -84,8 +84,8 @@ unsigned char parse_flags(char *str, char *prog_name)
 		    ;
 		else
 		{
-			printf("%s: illegal option -- %c\n", prog_name, *str);
-			printf("usage: %s [-Ralrt] [file ...]\n", prog_name);
+			fd_printf(2, "%s: illegal option -- %c\n", prog_name, *str);
+			fd_printf(2, "usage: ft_ls [-Ralrt] [file ...]\n");
 			exit(1);
 		}
 		str++;

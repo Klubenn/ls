@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "header_pf.h"
+#include "../includes/header_pf.h"
 
 int			numlength(long long l, int base)
 {
@@ -33,28 +33,12 @@ int			numlength(long long l, int base)
 	return (i);
 }
 
-t_list_pf	*new_list(void)
+t_list_pf	*new_list(int fd)
 {
 	t_list_pf	*list;
-	int			i;
 
-	i = -1;
-	list = (t_list_pf *)malloc(sizeof(t_list_pf));
-	while (++i <= 7)
-	{
-		list->flag0[i] = 0;
-		list->print[i] = 0;
-	}
-	list->flag1 = 0;
-	list->point = 0;
-	list->left = 0;
-	list->right = 0;
-	list->letter = 0;
-	list->number = NULL;
-	list->fl = 0.0;
-	list->leftfl = NULL;
-	list->rightfl = NULL;
-	list->zero = NULL;
+	list = (t_list_pf *)ft_memalloc(sizeof(t_list_pf));
+	list->fd = fd;
 	return (list);
 }
 

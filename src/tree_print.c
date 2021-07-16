@@ -56,19 +56,19 @@ void calculate_length_for_print(t_init *init)
  */
 void	print_l(t_init *init, t_node *node)
 {
-	printf("%s %*u %-*s  %-*s  ", node->data->rights,
+	ft_printf("%s %*u %-*s  %-*s  ", node->data->rights,
 		(u_int32_t)init->max_links, node->data->links,
 		init->max_user, node->data->user,
 		init->max_group, node->data->group);
 	if (init->major)
-		printf("%s", node->data->major);
-	printf("%*llu %s %5s %s", (u_int32_t)init->max_size, node->data->size_minor,
+		ft_printf("%s", node->data->major);
+	ft_printf("%*llu %s %5s %s", (u_int32_t)init->max_size, node->data->size_minor,
 		node->data->month_day,
 		node->data->time_year,
 		node->data->name);
 	if (node->data->link_to_file)
-        printf(" -> %s", node->data->link_to_file);
-    printf("\n");
+		ft_printf(" -> %s", node->data->link_to_file);
+	ft_printf("\n");
 }
 
 /*
@@ -77,16 +77,16 @@ void	print_l(t_init *init, t_node *node)
 void	print_1(t_init *init, t_node *node)
 {
     if (init)
-	    printf("%s\n", node->data->name);
+		ft_printf("%s\n", node->data->name);
 }
 
 void    print_dir(t_init *init, char *path)
 {
     calculate_length_for_print(init);
     if (init->print_path || init->print_line)
-        printf("%s:\n", path);
+		ft_printf("%s:\n", path);
     if (init->flag & FLAG_l && init->head)
-        printf("total %llu\n", init->total_for_dir);
+		ft_printf("total %llu\n", init->total_for_dir);
     apply_infix(init, init->head, init->print_func);
 }
 

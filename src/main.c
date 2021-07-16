@@ -7,7 +7,7 @@ void	add_element_to_dir_list(t_init *init, t_node *node)
 {
 	t_dir_list *current_dir;
 
-    if (node->data->rights[0] != 'd')
+    if (dir_or_file(node->data->path) != LS_DIR)
 		return;
 	current_dir = (t_dir_list *)ft_memalloc(sizeof(t_dir_list));
 	if (!current_dir)
@@ -106,8 +106,8 @@ void	collect_data_from_dir(t_init *init, char *path)
 	else
     {
 	    if (init->print_path)
-            printf("%s:\n", path);
-	    printf("%s: %s: Permission denied\n", init->prog_name, return_dir_name_without_slash(path));
+            fd_printf(2, "%s:\n", path);
+	    fd_printf(2, "ft_ls: %s: Permission denied\n", return_dir_name_without_slash(path));
     }
 	if (init->flag & FLAG_R)
     {
@@ -143,7 +143,7 @@ void    process_directories(t_init *init)
     while(dir_list)
     {
         if (init->print_line)
-            printf("\n");
+            ft_printf("\n");
         prev_dir = dir_list;
         collect_data_from_dir(init, dir_list->path);
         dir_list = dir_list->next;
@@ -175,7 +175,7 @@ void collect_elements(t_init *init, char **elements, bool files)
     }
 	else
     {
-	    if (dirnum > 1)
+	    if (dirnum > 1 || (init->args_absent && init->args_absent[0]))
 	        init->print_path = true;
         collect_dirs_from_tree(init);
         free_tree(init->head);
@@ -204,7 +204,6 @@ void	select_data_for_analysis(t_init *init)
 int main(int argc, char **argv) {
 	t_init init;
 
-    fd_printf(2, "123%s***\n", argv[0]);
 	ft_memset(&init, 0, sizeof(t_init));
 	init.prog_name = argv[0];
 	parse_input(argc, argv, &init);

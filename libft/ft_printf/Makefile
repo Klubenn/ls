@@ -3,43 +3,39 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: gtapioca <gtapioca@student.21-school.ru    +#+  +:+       +#+         #
+#    By: gtristan <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/01/17 13:58:43 by gtristan          #+#    #+#              #
-#    Updated: 2020/04/06 17:24:31 by gtapioca         ###   ########.fr        #
+#    Updated: 2020/05/19 17:02:45 by student          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = libftprintf.a
 
-INCL = ./includes/
-INCL_H = header_pf.h
-INCLUDES = $(addprefix $(INCL),$(INCL_H))
-INCL_LIB = ../
+INCL = includes
 
 SRC_DIR = src/
 SRC_C = analysis.c decimal.c float2.c float4.c ft_printf.c parsing.c \
   		printnum.c services_itoa.c create_string.c float.c float3.c free.c \
-		oct.c print_color.c putchar_str.c string_char.c make_result_str.c
+		libfunctions.c oct.c print_color.c putchar_str.c string_char.c
 SRC = $(addprefix $(SRC_DIR),$(SRC_C))
 
 OBJ_DIR = obj/
 OBJ_O = $(SRC_C:%.c=%.o)
 OBJ = $(addprefix $(OBJ_DIR),$(OBJ_O))
-LIB_O = ../ft_strlen.o ../ft_atoi.o ../ft_strjoin.o ../ft_strncpy.o ../ft_strcpy.o
 
-FLAGS =	-Wall -Werror -Wextra
+FLAGS = -Wall -Wextra -Werror
 
-all: $(OBJ_DIR) $(NAME) $(LIB_O) $(INCLUDES)
+all: $(OBJ_DIR) $(NAME)
 
 $(OBJ_DIR):
 	mkdir -p $(OBJ_DIR)
 
 $(NAME): $(SRC) $(OBJ) 
-	ar rc $(NAME) $(OBJ) $(LIB_O)
+	ar rc $(NAME) $(OBJ)
 	ranlib $(NAME)
 
-$(OBJ_DIR)%.o: $(SRC_DIR)%.c $(INCL)$(INCL_H)
+$(OBJ_DIR)%.o: $(SRC_DIR)%.c
 	gcc $(FLAGS) -I $(INCL) -o $@ -c $<
 
 clean:

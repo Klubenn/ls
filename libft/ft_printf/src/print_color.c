@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "header_pf.h"
+#include "../includes/header_pf.h"
 
 int		is_color(char *str, char *color)
 {
@@ -20,7 +20,7 @@ int		is_color(char *str, char *color)
 	return (1);
 }
 
-int		print_color(char *str)
+int		print_color(char *str, int fd)
 {
 	int			color_number;
 	int			i;
@@ -32,19 +32,19 @@ int		print_color(char *str)
 	while (++i < 7 && color_number == -1)
 		color_number = is_color(str, colors[i]) > 0 ? i : -1;
 	if (color_number == 0)
-		ft_putstr_pf(RESET);
+		ft_putstr_pf(RESET, fd);
 	else if (color_number == 1)
-		ft_putstr_pf(RED);
+		ft_putstr_pf(RED, fd);
 	else if (color_number == 2)
-		ft_putstr_pf(GREEN);
+		ft_putstr_pf(GREEN, fd);
 	else if (color_number == 3)
-		ft_putstr_pf(YELLOW);
+		ft_putstr_pf(YELLOW, fd);
 	else if (color_number == 4)
-		ft_putstr_pf(BLUE);
+		ft_putstr_pf(BLUE, fd);
 	else if (color_number == 5)
-		ft_putstr_pf(MAGENTA);
+		ft_putstr_pf(MAGENTA, fd);
 	else if (color_number == 6)
-		ft_putstr_pf(CYAN);
+		ft_putstr_pf(CYAN, fd);
 	i = ft_strlen(colors[color_number]);
 	return (i);
 }

@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "header_pf.h"
+#include "../includes/header_pf.h"
 
 void	zerocase(t_list_pf *list)
 {
@@ -21,20 +21,20 @@ void	zerocase(t_list_pf *list)
 	{
 		if (list->flag0[2])
 		{
-			ft_putchar_pf(list->flag0[2], 1);
+			ft_putchar_pf(list->flag0[2], 1, list->fd);
 			i++;
 		}
 		while (++i < list->left)
-			ft_putchar_pf(' ', 1);
+			ft_putchar_pf(' ', 1, list->fd);
 	}
 	else
 	{
 		if (list->flag0[2])
 			i++;
 		while (++i < list->left)
-			ft_putchar_pf(' ', 1);
+			ft_putchar_pf(' ', 1, list->fd);
 		if (list->flag0[2])
-			ft_putchar_pf(list->flag0[2], 1);
+			ft_putchar_pf(list->flag0[2], 1, list->fd);
 	}
 }
 
@@ -51,12 +51,12 @@ void	zerocase_u1(t_list_pf *list)
 	else if (list->flag0[3] && list->letter == 'o')
 	{
 		if (list->flag0[1])
-			ft_putchar_pf('0', 1);
+			ft_putchar_pf('0', 1, list->fd);
 		i++;
 		while (++i < list->left)
-			ft_putchar_pf(' ', 1);
+			ft_putchar_pf(' ', 1, list->fd);
 		if (!list->flag0[1])
-			ft_putchar_pf('0', 1);
+			ft_putchar_pf('0', 1, list->fd);
 	}
 }
 

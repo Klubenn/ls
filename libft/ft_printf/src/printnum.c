@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "header_pf.h"
+#include "../includes/header_pf.h"
 
 void	printnum(t_list_pf *list)
 {
@@ -19,7 +19,7 @@ void	printnum(t_list_pf *list)
 	i = 0;
 	while (i <= 7)
 	{
-		ft_putstr_pf(list->print[i]);
+		ft_putstr_pf(list->print[i], list->fd);
 		i++;
 	}
 }

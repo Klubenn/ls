@@ -12,7 +12,8 @@
 # include <stdbool.h>
 # include <pwd.h>
 # include <grp.h>
-# include "../libft/ft_printf/includes/header_pf.h"
+# include "../libft/libft.h"
+# include "../libft/ft_printf/includes/ft_printf.h"
 /*
 FLAG_l одна колонка, подробный вывод
 FLAG_R рекурсия по папкам
@@ -145,5 +146,6 @@ void	add_element_to_dir_list(t_init *init, t_node *node);
 void	*free_data(t_data *data);
 void	free_dir_list(t_init *init);
 void	free_args(t_init *init);
+int		dir_or_file(char *av);
 
 #endif

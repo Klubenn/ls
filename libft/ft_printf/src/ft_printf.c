@@ -10,13 +10,14 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "header_pf.h"
+#include "../includes/header_pf.h"
 
-void	separation(const char *format, va_list ap)
+void	separation(const char *format, va_list ap, int fd)
 {
 	int		i;
 	int		num;
 	char	*ch;
+
 
 	num = 0;
 	ch = (char *)format;
@@ -24,36 +25,39 @@ void	separation(const char *format, va_list ap)
 	{
 		while (*ch && *ch != '%')
 		{
-			if (*ch == '{' && (i = print_color(ch)))
+			if (*ch == '{' && (i = print_color(ch, fd)))
 			{
 				ch += i;
 				continue ;
 			}
-			ft_putchar_pf(*ch, 1);
+			ft_putchar_pf(*ch, 1, fd);
 			ch++;
 			num++;
 		}
 		if (*ch == '%')
 		{
 			ch++;
-			ch += parsing1(ch, ap);
+			ch += parsing1(ch, ap, fd);
 		}
 	}
 }
 
 int		ft_printf(const char *format, ...)
 {
-	va_list		ap;
-	char		*res_str;
+	va_list ap;
 
 	va_start(ap, format);
-	separation(format, ap);
+	separation(format, ap, 1);
 	va_end(ap);
-	res_str = get_result_str();
-	if (res_str)
-	{
-		write(get_fd(), res_str, ft_strlen(res_str));
-		free(res_str);
-	}
-	return (ft_putchar_pf('@', 0));
+	return (ft_putchar_pf('@', 0, 1));
+}
+
+int		fd_printf(int fd, const char *format, ...)
+{
+	va_list ap;
+
+	va_start(ap, format);
+	separation(format, ap, fd);
+	va_end(ap);
+	return (ft_putchar_pf('@', 0, fd));
 }

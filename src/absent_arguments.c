@@ -53,15 +53,10 @@ static void print_absent_arguments(char **args)
 			while (--j >= 0 && str[j] == '/')
 				str[j] = 0;
 			if (stat(str, &buf) == 0)
-				printf("ft_ls: %s: Not a directory\n", args[i]);
+				fd_printf(2, "ft_ls: %s: Not a directory\n", args[i]);
 		}
 		else
-        {
-            write(2, "ft_ls: ", 7);
-            write(2, args[i], ft_strlen(args[i]));
-            write(2, ": No such file or directory\n", ft_strlen(": No such file or directory\n"));
-        }
-//			printf("ft_ls: %s: No such file or directory\n", args[i]);
+			fd_printf(2, "ft_ls: %s: No such file or directory\n", args[i]);
 		i++;
 	}
 }

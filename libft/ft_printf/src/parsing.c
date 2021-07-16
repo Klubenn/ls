@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "header_pf.h"
+#include "../includes/header_pf.h"
 
 int		parsing2(t_list_pf *list, va_list ap, char *ch)
 {
@@ -39,12 +39,12 @@ int		parsing2(t_list_pf *list, va_list ap, char *ch)
 	return (ii);
 }
 
-int		parsing1(char *ch, va_list ap)
+int		parsing1(char *ch, va_list ap, int fd)
 {
 	int			ii;
 	t_list_pf	*list;
 
-	list = new_list();
+	list = new_list(fd);
 	ii = parsing2(list, ap, ch);
 	ch += ii;
 	if (!*ch)

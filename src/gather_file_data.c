@@ -172,11 +172,6 @@ bool list_attr(char *path)
 	errno = 0;
 	if (listxattr(path, NULL, 0, XATTR_NOFOLLOW) && errno == 0)
 		attr = true;
-
-//	char namebuf[1024] = {0};
-//	size_t size = listxattr(path, namebuf, 1024, XATTR_NOFOLLOW);
-//	printf("%zu *** %s ***---\n", size, namebuf);
-
 	errno = 0;
 	return (attr);
 }
@@ -223,5 +218,5 @@ void	read_stat(t_init *init, char *path, char *name, bool show_local_dir)
 		init->num_of_nodes += 1;
 	}
 	else
-		printf("Error getting data for %s\n", path);
+		fd_printf(2, "Error getting data for %s\n", path);
 }

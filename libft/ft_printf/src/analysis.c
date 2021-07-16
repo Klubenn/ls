@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "header_pf.h"
+#include "../includes/header_pf.h"
 
 void	string1(t_list_pf *list, va_list ap)
 {
@@ -26,13 +26,13 @@ void	string1(t_list_pf *list, va_list ap)
 	{
 		if (list->flag0[1])
 		{
-			i = ft_putstr_pf(str);
-			ft_putchar_pf(' ', list->left - i);
+			i = ft_putstr_pf(str, list->fd);
+			ft_putchar_pf(' ', list->left - i, list->fd);
 		}
 		else
 		{
-			ft_putchar_pf(list->flag0[0], list->left - ft_strlen_pf(str));
-			ft_putstr_pf(str);
+			ft_putchar_pf(list->flag0[0], list->left - ft_strlen_pf(str), list->fd);
+			ft_putstr_pf(str, list->fd);
 		}
 	}
 }
@@ -71,16 +71,6 @@ void	pointer(t_list_pf *list, va_list ap)
 	printnum(list);
 }
 
-void	fd_z(va_list ap)
-{
-	long long	i;
-	int			j;
-
-	i = va_arg(ap, long long);
-	j = (int)i;
-	set_fd(j);
-}
-
 void	analysis(t_list_pf *list, va_list ap)
 {
 	if (list->letter == 'd' || list->letter == 'i')
@@ -101,6 +91,4 @@ void	analysis(t_list_pf *list, va_list ap)
 		pointer(list, ap);
 	else if (list->letter == 'f')
 		float_f(list, ap);
-	else if (list->letter == 'z')
-		fd_z(ap);
 }

@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "header_pf.h"
+#include "../includes/header_pf.h"
 
 void	percent(t_list_pf *list)
 {
@@ -34,18 +34,18 @@ void	character(t_list_pf *list, va_list ap)
 	str = create_string(' ', list->left - 1);
 	if (list->flag0[1])
 	{
-		ft_putchar_pf(c, 1);
-		ft_putstr_pf(str);
+		ft_putchar_pf(c, 1, list->fd);
+		ft_putstr_pf(str, list->fd);
 	}
 	else
 	{
-		ft_putstr_pf(str);
-		ft_putchar_pf(c, 1);
+		ft_putstr_pf(str, list->fd);
+		ft_putchar_pf(c, 1, list->fd);
 	}
 	free(str);
 }
 
-size_t	ft_putstr_len_pf(char *str, size_t len)
+size_t	ft_putstr_len_pf(char *str, size_t len, int fd)
 {
 	size_t i;
 
@@ -54,7 +54,7 @@ size_t	ft_putstr_len_pf(char *str, size_t len)
 		return (0);
 	while (len > 0 && *str)
 	{
-		ft_putchar_pf(*str, 1);
+		ft_putchar_pf(*str, 1, fd);
 		str++;
 		len--;
 		i++;
@@ -68,21 +68,21 @@ void	string2(t_list_pf *list, char *str)
 
 	if (list->flag0[1])
 	{
-		i = ft_putstr_len_pf(str, list->right);
-		ft_putchar_pf(' ', list->left - i);
+		i = ft_putstr_len_pf(str, list->right, list->fd);
+		ft_putchar_pf(' ', list->left - i, list->fd);
 	}
 	else
 	{
 		i = list->right - ft_strlen_pf(str);
 		if (i <= 0)
 		{
-			ft_putchar_pf(list->flag0[0], list->left - list->right);
-			ft_putstr_len_pf(str, list->right);
+			ft_putchar_pf(list->flag0[0], list->left - list->right, list->fd);
+			ft_putstr_len_pf(str, list->right, list->fd);
 		}
 		else
 		{
-			ft_putchar_pf(list->flag0[0], list->left - list->right + i);
-			ft_putstr_pf(str);
+			ft_putchar_pf(list->flag0[0], list->left - list->right + i, list->fd);
+			ft_putstr_pf(str, list->fd);
 		}
 	}
 }
