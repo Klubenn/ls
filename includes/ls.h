@@ -22,7 +22,7 @@ FLAG_r обратный порядок сортировки
 FLAG_t сортировка по времени изменения, новое сверху
 
 FLAG_u сортировка по времени последнего доступа к файлу
-FLAG_f не сортировать
+FLAG_f не сортировать + а
 FLAG_g как l, но не выводит имя владельца
 FLAG_d каталоги выводятся как обычные файлы, опция R игнорируется
 */
@@ -146,6 +146,6 @@ void	add_element_to_dir_list(t_init *init, t_node *node);
 void	*free_data(t_data *data);
 void	free_dir_list(t_init *init);
 void	free_args(t_init *init);
-int		dir_or_file(char *av);
+int		dir_or_file(t_init *init, char *av);
 
 #endif

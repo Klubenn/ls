@@ -33,6 +33,12 @@ void	fill_rights(t_data *data, mode_t mode, bool attr)
 	data->rights[9] = (mode & S_IXOTH)? 'x' : '-';
 	data->rights[10] = attr? '@' : ' ';
 	data->rights[11] = 0;
+	if (mode & S_ISUID)
+		data->rights[3] = (data->rights[3] == '-')? 'S' : 's';
+	if (mode & S_ISGID)
+		data->rights[6] = (data->rights[6] == '-')? 'S' : 's';
+	if (mode & S_ISVTX)
+		data->rights[9] = (data->rights[9] == '-')? 'T' : 't';
 }
 
 unsigned int module(time_t t1, time_t t2)
@@ -69,11 +75,22 @@ int	fill_ownership(t_init *init, t_data *data, uid_t uid, gid_t gid)
 
 	pwd = getpwuid(uid);
 	grp = getgrgid(gid);
-	if (!pwd || !grp)
+//	if (!pwd || !grp)
+//		return (-1);
+	if (!pwd)
+	{
+		if (!(data->user = ft_strdup("501")))
+			return (-1);
+	}
+	else if (!(data->user = ft_strdup(pwd->pw_name)))
 		return (-1);
-	if (!(data->user = ft_strdup(pwd->pw_name)))
-		return (-1);
-	if (!(data->group = ft_strdup(grp->gr_name)))
+
+	if (!grp)
+	{
+		if (!(data->group = ft_strdup("501")))
+			return (-1);
+	}
+	else if(!(data->group = ft_strdup(grp->gr_name)))
 		return (-1);
 	init->max_user = MAX(ft_strlen(data->user), init->max_user);
 	init->max_group = MAX(ft_strlen(data->group), init->max_group);
@@ -156,11 +173,6 @@ t_data *new_data(t_init *init, char *path, char *name, struct stat *buf, bool at
 	}
 	if (init->flag & FLAG_t)
 		data->time = (double)buf->st_mtimespec.tv_sec + ((double)buf->st_mtimespec.tv_nsec / 1000000000LU);
-
-
-
-
-	///////////////////
 	return data;
 }
 

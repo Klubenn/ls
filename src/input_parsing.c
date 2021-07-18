@@ -5,13 +5,15 @@
  * возвращается значение LS_FILE, если директория, то LS_DIR, если такого
  * файла/директории не существует, то LS_NOSUCHFILE.
  */
-int	dir_or_file(char *av)
+int	dir_or_file(t_init *init, char *av)
 {
 	struct stat buf;
 
-	if (stat(av, &buf) == 0)
+	if (stat(av, &buf) == 0 || lstat(av, &buf) == 0)
 	{
-		if (S_ISDIR(buf.st_mode))
+		if (init->flag & FLAG_l)
+			lstat(av, &buf);
+		if (S_ISDIR(buf.st_mode) && !(init->flag & FLAG_d))
 			return (LS_DIR);
 		else
 			return (LS_FILE);
@@ -45,7 +47,7 @@ int parse_args(int ac, char **av, int argnum, t_init *input)
 	{
 		if (*av)
 		{
-			res = dir_or_file(*av);
+			res = dir_or_file(input, *av);
 			if (res == LS_NOSUCHFILE)
 				input->args_absent[++abs] = *av;
 			else if (res == LS_DIR)
@@ -61,36 +63,36 @@ int parse_args(int ac, char **av, int argnum, t_init *input)
  * Парсинг флагов. На вход принимается строка. Возвращается битовая маска
  * размера 1 байт.
  */
-unsigned char parse_flags(char *str, char *prog_name)
+void parse_flags(t_init *init, char *str)
 {
-	unsigned char num;
-
-	num = 0;
 	while (*str)
 	{
 		if (*str == 'l')
-			num += FLAG_l;
+			init->flag |= FLAG_l;
 		else if (*str == 'R')
-			num += FLAG_R;
+			init->flag |= FLAG_R;
 		else if (*str == 'a')
-			num += FLAG_a;
+			init->flag |= FLAG_a;
 		else if (*str == 'r')
-			num += FLAG_r;
+			init->flag |= FLAG_r;
 		else if (*str == 't')
-			num += FLAG_t;
+			init->flag |= FLAG_t;
 		else if (*str == 'f')
-			num += FLAG_f;
+			init->flag |= FLAG_f | FLAG_a;
+		else if (*str == 'g')
+			init->flag |= FLAG_g | FLAG_l;
+		else if (*str == 'd')
+			init->flag |= FLAG_d;
 		else if (*str == '1')
-		    ;
+			init->flag = (init->flag | FLAG_l | FLAG_g) - FLAG_l - FLAG_g;
 		else
 		{
-			fd_printf(2, "%s: illegal option -- %c\n", prog_name, *str);
+			fd_printf(2, "%s: illegal option -- %c\n", init->prog_name, *str);
 			fd_printf(2, "usage: ft_ls [-Ralrt] [file ...]\n");
 			exit(1);
 		}
 		str++;
 	}
-	return (num);
 }
 
 /*
@@ -102,10 +104,8 @@ void parse_input(int ac, char **av, t_init *input)
 {
 	int				i;
 	int				res;
-	unsigned char   flags;
 
 	i = 0;
-	flags = 0;
 	res = 0;
 	while (++i < ac)
 	{
@@ -116,12 +116,11 @@ void parse_input(int ac, char **av, t_init *input)
 		        i++;
 		        break;
             }
-		    flags = flags | parse_flags(av[i] + 1, av[0]);
+		    parse_flags(input, av[i] + 1);
         }
 		else
 		    break;
 	}
-	input->flag = flags;
 	if (i != ac)
 		res = parse_args(ac, av, ac - i, input);
 	if (res != 0)

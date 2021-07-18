@@ -7,7 +7,7 @@ void	add_element_to_dir_list(t_init *init, t_node *node)
 {
 	t_dir_list *current_dir;
 
-    if (dir_or_file(node->data->path) != LS_DIR)
+    if (dir_or_file(init, node->data->path) != LS_DIR)
 		return;
 	current_dir = (t_dir_list *)ft_memalloc(sizeof(t_dir_list));
 	if (!current_dir)
