@@ -57,6 +57,7 @@ void	fill_time(t_data *data, struct timespec time_file)
 	bool over_six_months;
 	time_t time_now;
 
+	data->time = (double)time_file.tv_sec + ((double)time_file.tv_nsec / 1000000000LU);
 	time_now = time(NULL);
 	over_six_months = module(time_now, time_file.tv_sec) > SIX_MONTHS ? true : false;
 	t = ctime(&(time_file.tv_sec));
@@ -156,14 +157,17 @@ t_data *new_data(t_init *init, char *path, char *name, struct stat *buf, bool at
 	if (!(data->path = ft_strdup(path)))
         return free_data(data);
     fill_file_type(data, buf->st_mode);
-	if (init->flag & FLAG_l)
+	if (init->flag & (FLAG_l | FLAG_t))
 	{
 		fill_rights(data, buf->st_mode, attr);
 		data->blocks = buf->st_blocks;
 		init->total_for_dir += data->blocks;
 		data->links = buf->st_nlink;
 		init->max_links = (init->max_links >= data->links)? init->max_links : data->links;
-		fill_time(data, buf->st_mtimespec);
+		if (init->flag & FLAG_u)
+			fill_time(data, buf->st_atimespec);
+		else
+			fill_time(data, buf->st_mtimespec);
 		if (fill_ownership(init, data, buf->st_uid, buf->st_gid) != 0)
             return free_data(data);
 		fill_size_major_minor(init, data, buf);
@@ -171,8 +175,6 @@ t_data *new_data(t_init *init, char *path, char *name, struct stat *buf, bool at
 		    if (fill_link_to_file(data, path) != 0)
                 return free_data(data);
 	}
-	if (init->flag & FLAG_t)
-		data->time = (double)buf->st_mtimespec.tv_sec + ((double)buf->st_mtimespec.tv_nsec / 1000000000LU);
 	return data;
 }
 

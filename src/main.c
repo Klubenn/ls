@@ -170,6 +170,8 @@ void collect_elements(t_init *init, char **elements, bool files)
     {
         calculate_length_for_print(init);
         apply_infix(init, init->head, init->print_func);
+        if (init->print_func == &collect_col)
+        	print_col(init);
         free_tree(init->head);
         init->head = NULL;
     }
@@ -183,6 +185,33 @@ void collect_elements(t_init *init, char **elements, bool files)
     }
 }
 
+void	flag_d_analysis(t_init *init)
+{
+	int a;
+	int b;
+
+	if (!init->args_files && !init->args_dirs)
+	{
+		init->args_files = (char **)ft_memalloc(sizeof(char *) * 2);
+		init->args_files[0] = ft_strdup(".");
+		if (!init->args_files[0])
+			myexit(init, ENOMEM);
+		collect_elements(init, init->args_files, true);
+		free(init->args_files[0]);
+	}
+	else
+	{
+		a = 0;
+		b = 0;
+		while(init->args_files[a])
+			a++;
+		while(init->args_files[b])
+			b++;
+		ft_memcpy(init->args_files + a, init->args_dirs, b);
+		collect_elements(init, init->args_files, true);
+	}
+}
+
 /*
  * Начало обработки аргументов. При их отсутствии обрабатывается
  * текущая директория. В противном случае сначала обрабатываются и
@@ -190,6 +219,11 @@ void collect_elements(t_init *init, char **elements, bool files)
  */
 void	select_data_for_analysis(t_init *init)
 {
+	if (init->flag & FLAG_d)
+	{
+		flag_d_analysis(init);
+		return;
+	}
 	if (!init->args_files && !init->args_dirs)
 		collect_data_from_dir(init, ".");
     if (init->args_files && init->args_files[0])

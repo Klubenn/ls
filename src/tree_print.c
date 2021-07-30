@@ -1,3 +1,4 @@
+#include <sys/ioctl.h>
 #include "../includes/ls.h"
 
 bool    check_dot_dirs(char *path)
@@ -32,7 +33,6 @@ void	apply_infix(t_init *init, t_node *node, void (*callback_func)(t_init *, t_n
 			add_element_to_dir_list(init, node);
 		if (init->flag & FLAG_R && !check_dot_dirs(node->data->name))
             add_element_to_dir_list(init, node);
-
 		if (node->right)
 			apply_infix(init, node->right, callback_func);
 	}
@@ -95,6 +95,72 @@ void	print_1(t_init *init, t_node *node)
 {
     if (init)
 		ft_printf("%s\n", node->data->name);
+}
+
+void	create_col_structs(t_init *init)
+{
+	// дописать функционал по нахождению максимальной длины имени, очистку памяти в myexit, зануление после печати
+	t_col *col;
+	int col_width_in_tabs;
+	int number_of_cols;
+	struct winsize	ws;
+	int i;
+
+	col = (t_col *) ft_memalloc(sizeof(t_col));
+	if (!col)
+		myexit(init, ENOMEM);
+	init->col = col;
+	col_width_in_tabs = init->max_len / 8 + 1;
+	ioctl(0, TIOCGWINSZ, &ws);
+	number_of_cols = ws.ws_col / 8 / col_width_in_tabs;
+	for (i = 0; i < number_of_cols; i++)
+	{
+		col->sequence_number = i;
+		col->amount_of_tabs = col_width_in_tabs;
+		col->string = (char *) ft_memalloc(ws.ws_col + 1);
+		col->next = (i == number_of_cols + 1)? init->col : (t_col *) ft_memalloc(sizeof(t_col));
+		if (!col->next)
+			myexit(init, ENOMEM);
+	}
+
+
+}
+
+void	collect_col(t_init *init, t_node *node)
+{
+	t_col *col;
+	int sequence_number;
+	int tabs_to_print;
+
+	if (!init->col)
+		create_col_structs(init);
+	col = init->col;
+	while(col->sequence_number < col->next->sequence_number)
+		col = col->next;
+	sequence_number = col->sequence_number + 1;
+	col = col->next;
+	if (col->last_elem_len)
+	{
+		tabs_to_print = 0;
+		while(col->last_elem_len + tabs_to_print * 8 < col->amount_of_tabs * 8)
+		{
+			ft_strcat(col->string, "\t");
+			tabs_to_print += 1;
+		}
+	}
+	ft_strcat(col->string, node->data->name);
+	col->last_elem_len = ft_strlen(node->data->name);
+	col->sequence_number = sequence_number;
+
+}
+
+void	print_col(t_init *init)
+{
+	t_col *col;
+
+	col = init->col;
+	////////////////////////////////
+	while()
 }
 
 void    print_dir(t_init *init, char *path)

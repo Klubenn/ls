@@ -85,12 +85,26 @@ typedef struct s_dir_list
 }					t_dir_list;
 
 /*
+ * Структура нужна для вывода в столбцах названий. Названия последовательно
+ * сохраняются в структурах и перемежаются табуляциями
+ */
+typedef struct s_col
+{
+	int 			sequence_number;
+	int				amount_of_tabs;
+	char			*string;
+	size_t			last_elem_len;
+	struct s_col	*next;
+}				t_col;
+
+/*
  * flag - флаги: -lRart
  * args_absent - не существующие файлы/директории
  * args_dirs - аргументы директории
  * args_files - остальные аргументы (файлы)
  * comparing_func - функция сравнения, по которой будет проходить сортировка
  * print_func - функция печати
+ * col - структуры для вывода на печать в колонку
  * head - вершина бинарного дерева
  * dir_list - список директорий, по которым надо будет пройти при рекурсии
  * dir_list_last_elem - последний элемент в списке директорий
@@ -100,6 +114,7 @@ typedef struct s_dir_list
  * max_user - максимальный номер / разрядность пользователя
  * max_group - максимальный номер / разрядность группы
  * max_size - максимальный размер / разрядность файла
+ * max_len - максимальная длина названия
  * major
  * print_line
  */
@@ -112,6 +127,7 @@ typedef struct s_init
 	char			**args_files;
 	int				(*comparing_func)(t_data *, t_data *);
 	void			(*print_func)(struct s_init *, t_node *);
+	t_col			*col;
 	t_node			*head;
 	t_dir_list		*dir_list;
 	t_dir_list		*dir_list_last_elem;
@@ -121,6 +137,7 @@ typedef struct s_init
 	u_int8_t		max_user;
 	u_int8_t		max_group;
 	u_int64_t		max_size;
+	int				max_len;
 	bool			major;
 	bool            print_line;
 	bool            print_path;
@@ -147,5 +164,7 @@ void	*free_data(t_data *data);
 void	free_dir_list(t_init *init);
 void	free_args(t_init *init);
 int		dir_or_file(t_init *init, char *av);
+void	collect_col(t_init *init, t_node *node);
+void	print_col(t_init *init);
 
 #endif

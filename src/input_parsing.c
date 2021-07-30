@@ -77,6 +77,8 @@ void parse_flags(t_init *init, char *str)
 			init->flag |= FLAG_r;
 		else if (*str == 't')
 			init->flag |= FLAG_t;
+		else if (*str == 'u')
+			init->flag |= FLAG_u;
 		else if (*str == 'f')
 			init->flag |= FLAG_f | FLAG_a;
 		else if (*str == 'g')
@@ -93,6 +95,8 @@ void parse_flags(t_init *init, char *str)
 		}
 		str++;
 	}
+	if (init->flag & FLAG_d)
+		init->flag = (init->flag | FLAG_R) - FLAG_R;
 }
 
 /*
@@ -125,4 +129,5 @@ void parse_input(int ac, char **av, t_init *input)
 		res = parse_args(ac, av, ac - i, input);
 	if (res != 0)
 		myexit(input, res);
+
 }
