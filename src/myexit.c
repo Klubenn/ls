@@ -76,6 +76,7 @@ void	free_col(t_init *init)
 			break;
 	}
 	init->col = NULL;
+	init->max_len = 0;
 }
 
 void	myexit(t_init *init, int err)

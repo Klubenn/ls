@@ -35,7 +35,7 @@ $(NAME): $(SRC) $(OBJ)
 	ar rc $(NAME) $(OBJ)
 	ranlib $(NAME)
 
-$(OBJ_DIR)%.o: $(SRC_DIR)%.c
+$(OBJ_DIR)%.o: $(SRC_DIR)%.c $(INCL)
 	gcc $(FLAGS) -I $(INCL) -o $@ -c $<
 
 clean:

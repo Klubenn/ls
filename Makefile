@@ -1,4 +1,4 @@
-NAME = "ft_ls"
+NAME = ft_ls
 
 LIBFT_DIR = ./libft/
 LIBFT = lft

@@ -20,7 +20,7 @@ void	fill_file_type(t_data *data, mode_t mode)
 		data->rights[0] = 'p';
 }
 
-void	fill_rights(t_data *data, mode_t mode, bool attr)
+void	fill_rights(t_data *data, mode_t mode, char attr)
 {
 	data->rights[1] = (mode & S_IRUSR)? 'r' : '-';
 	data->rights[2] = (mode & S_IWUSR)? 'w' : '-';
@@ -31,7 +31,7 @@ void	fill_rights(t_data *data, mode_t mode, bool attr)
 	data->rights[7] = (mode & S_IROTH)? 'r' : '-';
 	data->rights[8] = (mode & S_IWOTH)? 'w' : '-';
 	data->rights[9] = (mode & S_IXOTH)? 'x' : '-';
-	data->rights[10] = attr? '@' : ' ';
+	data->rights[10] = attr;
 	data->rights[11] = 0;
 	if (mode & S_ISUID)
 		data->rights[3] = (data->rights[3] == '-')? 'S' : 's';
@@ -76,8 +76,6 @@ int	fill_ownership(t_init *init, t_data *data, uid_t uid, gid_t gid)
 
 	pwd = getpwuid(uid);
 	grp = getgrgid(gid);
-//	if (!pwd || !grp)
-//		return (-1);
 	if (!pwd)
 	{
 		if (!(data->user = ft_strdup("501")))
@@ -145,7 +143,7 @@ int    fill_link_to_file(t_data *data, char *path)
 }
 
 
-t_data *new_data(t_init *init, char *path, char *name, struct stat *buf, bool attr)
+t_data *new_data(t_init *init, char *path, char *name, struct stat *buf, char attr)
 {
 	t_data	*data;
 	int		len;
@@ -181,15 +179,20 @@ t_data *new_data(t_init *init, char *path, char *name, struct stat *buf, bool at
 	return data;
 }
 
-bool list_attr(char *path)
+char list_attr(char *path)
 {
-	bool attr;
+	char		attr;
+	acl_t		acl;
+	acl_entry_t	entry_p;
 
-	attr = false;
+	attr = ' ';
+	acl = acl_get_file(path, ACL_TYPE_EXTENDED);
+	if (acl && acl_get_entry(acl, ACL_FIRST_ENTRY, &entry_p) == 0)
+		attr = '+';
+	acl_free(acl);
 	errno = 0;
 	if (listxattr(path, NULL, 0, XATTR_NOFOLLOW) && errno == 0)
-		attr = true;
-	errno = 0;
+		attr = '@';
 	return (attr);
 }
 

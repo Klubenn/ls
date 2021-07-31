@@ -14,6 +14,8 @@
 # include <grp.h>
 # include "../libft/libft.h"
 # include "../libft/ft_printf/includes/ft_printf.h"
+#include <sys/acl.h>
+
 /*
 FLAG_l одна колонка, подробный вывод
 FLAG_R рекурсия по папкам
@@ -52,7 +54,7 @@ enum
 #define MAX(a,b) ((a) >= (b)) ? (a) : (b)
 #define MAX_FILE_PATH_LEN 4096
 /*
- * rights[12] - drwxrwxrwx@
+ * rights[12] - drwxrwxrwx[@+]
  */
 typedef struct s_data
 {

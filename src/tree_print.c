@@ -99,12 +99,13 @@ void	print_1(t_init *init, t_node *node)
 
 void	create_col_structs(t_init *init)
 {
-	t_col *col;
-	int col_width_in_tabs;
-	u_int8_t number_of_rows;
-	int number_of_cols;
+	t_col			*col;
+	int				col_width_in_tabs;
+	u_int8_t		number_of_rows;
+	int				number_of_cols;
 	struct winsize	ws;
-	int i;
+	u_int8_t		string_width;
+	int				i;
 
 	col = (t_col *) ft_memalloc(sizeof(t_col));
 	if (!col)
@@ -112,7 +113,10 @@ void	create_col_structs(t_init *init)
 	init->col = col;
 	col_width_in_tabs = init->max_len / 8 + 1;
 	ioctl(0, TIOCGWINSZ, &ws);
-	number_of_cols = ws.ws_col / 8 / col_width_in_tabs;
+	string_width = (ws.ws_col >= init->max_len)? ws.ws_col + 1 : init->max_len + 1;
+	number_of_cols = string_width / 8 / col_width_in_tabs;
+	if (number_of_cols == 0)
+		number_of_cols = 1;
 	number_of_rows = (init->num_of_nodes % number_of_cols) ?  (init->num_of_nodes / number_of_cols + 1) :
 					(init->num_of_nodes / number_of_cols);
 	for (i = 0; i < number_of_rows; i++)
@@ -152,7 +156,6 @@ void	collect_col(t_init *init, t_node *node)
 	ft_strcat(col->string, node->data->name);
 	col->last_elem_len = (int)ft_strlen(node->data->name);
 	col->sequence_number = sequence_number;
-
 }
 
 void	print_col(t_init *init)
@@ -160,6 +163,8 @@ void	print_col(t_init *init)
 	t_col *col;
 
 	col = init->col;
+	if (!col)
+		return;
 	while(1)
 	{
 		ft_printf("%s\n", col->string);
@@ -188,7 +193,7 @@ void    print_dir(t_init *init, char *path)
 void	select_print_function(t_init *init)
 {
 	init->print_func = &collect_col;
-	if (init->flag & FLAG_l)
+	if (init->flag & FLAG_1)
 		init->print_func = &print_1;
 	if (init->flag & FLAG_l)
 		init->print_func = &print_l;
