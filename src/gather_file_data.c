@@ -147,7 +147,8 @@ int    fill_link_to_file(t_data *data, char *path)
 
 t_data *new_data(t_init *init, char *path, char *name, struct stat *buf, bool attr)
 {
-	t_data *data;
+	t_data	*data;
+	int		len;
 
 	data = (t_data *) ft_memalloc(sizeof(t_data));
 	if (!data)
@@ -175,6 +176,8 @@ t_data *new_data(t_init *init, char *path, char *name, struct stat *buf, bool at
 		    if (fill_link_to_file(data, path) != 0)
                 return free_data(data);
 	}
+	len = (int)ft_strlen(name);
+	init->max_len = (len > init->max_len)? len : init->max_len;
 	return data;
 }
 

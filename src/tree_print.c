@@ -99,9 +99,9 @@ void	print_1(t_init *init, t_node *node)
 
 void	create_col_structs(t_init *init)
 {
-	// дописать функционал по нахождению максимальной длины имени, очистку памяти в myexit, зануление после печати
 	t_col *col;
 	int col_width_in_tabs;
+	u_int8_t number_of_rows;
 	int number_of_cols;
 	struct winsize	ws;
 	int i;
@@ -113,17 +113,18 @@ void	create_col_structs(t_init *init)
 	col_width_in_tabs = init->max_len / 8 + 1;
 	ioctl(0, TIOCGWINSZ, &ws);
 	number_of_cols = ws.ws_col / 8 / col_width_in_tabs;
-	for (i = 0; i < number_of_cols; i++)
+	number_of_rows = (init->num_of_nodes % number_of_cols) ?  (init->num_of_nodes / number_of_cols + 1) :
+					(init->num_of_nodes / number_of_cols);
+	for (i = 0; i < number_of_rows; i++)
 	{
 		col->sequence_number = i;
 		col->amount_of_tabs = col_width_in_tabs;
 		col->string = (char *) ft_memalloc(ws.ws_col + 1);
-		col->next = (i == number_of_cols + 1)? init->col : (t_col *) ft_memalloc(sizeof(t_col));
+		col->next = (i == number_of_rows - 1)? init->col : (t_col *) ft_memalloc(sizeof(t_col));
 		if (!col->next)
 			myexit(init, ENOMEM);
+		col = col->next;
 	}
-
-
 }
 
 void	collect_col(t_init *init, t_node *node)
@@ -149,7 +150,7 @@ void	collect_col(t_init *init, t_node *node)
 		}
 	}
 	ft_strcat(col->string, node->data->name);
-	col->last_elem_len = ft_strlen(node->data->name);
+	col->last_elem_len = (int)ft_strlen(node->data->name);
 	col->sequence_number = sequence_number;
 
 }
@@ -159,8 +160,14 @@ void	print_col(t_init *init)
 	t_col *col;
 
 	col = init->col;
-	////////////////////////////////
-	while()
+	while(1)
+	{
+		ft_printf("%s\n", col->string);
+		col = col->next;
+		if (col == init->col)
+			break;
+	}
+	free_col(init);
 }
 
 void    print_dir(t_init *init, char *path)
@@ -171,6 +178,8 @@ void    print_dir(t_init *init, char *path)
     if (init->flag & FLAG_l && init->head)
 		ft_printf("total %llu\n", init->total_for_dir);
     apply_infix(init, init->head, init->print_func);
+    if (init->print_func == &collect_col)
+    	print_col(init);
 }
 
 /*
@@ -178,7 +187,9 @@ void    print_dir(t_init *init, char *path)
  */
 void	select_print_function(t_init *init)
 {
-	init->print_func = &print_1;
+	init->print_func = &collect_col;
+	if (init->flag & FLAG_l)
+		init->print_func = &print_1;
 	if (init->flag & FLAG_l)
 		init->print_func = &print_l;
 	if (init->flag & FLAG_g)

@@ -58,11 +58,13 @@ void	free_args(t_init *init)
 		free(init->args_absent);
 }
 
-void	free_col(t_col *col)
+void	free_col(t_init *init)
 {
 	t_col *init_col;
 	t_col *prev_col;
+	t_col *col;
 
+	col = init->col;
 	init_col = col;
 	while(1)
 	{
@@ -73,6 +75,7 @@ void	free_col(t_col *col)
 		if (col == init_col)
 			break;
 	}
+	init->col = NULL;
 }
 
 void	myexit(t_init *init, int err)
@@ -83,7 +86,9 @@ void	myexit(t_init *init, int err)
 		if (init->head)
 			free_tree(init->head);
 		if (init->col)
-			free_col(init->col);
+			free_col(init);
+		if (init->dir_list)
+			free_dir_list(init);
 	}
 	exit(err);
 }

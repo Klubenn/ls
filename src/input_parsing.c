@@ -86,7 +86,10 @@ void parse_flags(t_init *init, char *str)
 		else if (*str == 'd')
 			init->flag |= FLAG_d;
 		else if (*str == '1')
+		{
 			init->flag = (init->flag | FLAG_l | FLAG_g) - FLAG_l - FLAG_g;
+			init->flag |= FLAG_1;
+		}
 		else
 		{
 			fd_printf(2, "%s: illegal option -- %c\n", init->prog_name, *str);

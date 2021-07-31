@@ -38,6 +38,7 @@ enum
 	FLAG_f = (unsigned int)1 << 6,
 	FLAG_g = (unsigned int)1 << 7,
 	FLAG_d = (unsigned int)1 << 8,
+	FLAG_1 = (unsigned int)1 << 9,
 };
 
 enum
@@ -93,7 +94,7 @@ typedef struct s_col
 	int 			sequence_number;
 	int				amount_of_tabs;
 	char			*string;
-	size_t			last_elem_len;
+	int 			last_elem_len;
 	struct s_col	*next;
 }				t_col;
 
@@ -166,5 +167,6 @@ void	free_args(t_init *init);
 int		dir_or_file(t_init *init, char *av);
 void	collect_col(t_init *init, t_node *node);
 void	print_col(t_init *init);
+void	free_col(t_init *init);
 
 #endif
