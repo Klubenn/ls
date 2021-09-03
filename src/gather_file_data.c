@@ -156,7 +156,7 @@ t_data *new_data(t_init *init, char *path, char *name, struct stat *buf, char at
 	if (!(data->path = ft_strdup(path)))
         return free_data(data);
     fill_file_type(data, buf->st_mode);
-	if (init->flag & (FLAG_l | FLAG_t))
+	if (init->flag & (FLAG_l | FLAG_t | FLAG_G))
 	{
 		fill_rights(data, buf->st_mode, attr);
 		data->blocks = buf->st_blocks;

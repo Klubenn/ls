@@ -85,6 +85,8 @@ void parse_flags(t_init *init, char *str)
 			init->flag |= FLAG_g | FLAG_l;
 		else if (*str == 'd')
 			init->flag |= FLAG_d;
+		else if (*str == 'G')
+			init->flag |= FLAG_G;
 		else if (*str == '1')
 		{
 			init->flag &= ~(FLAG_l | FLAG_g);

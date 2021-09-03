@@ -53,6 +53,30 @@ void calculate_length_for_print(t_init *init)
     init->max_size = i;
 }
 
+void insert_color(t_init *init, t_node *node)
+{
+	if (init->flag & FLAG_G)
+	{
+		if (node->data->rights[0] == 'd')
+			ft_printf("{blue}");
+		else if (node->data->rights[0] == 'l')
+			ft_printf("{magenta}");
+		else if (node->data->rights[0] == 's')
+			ft_printf("{green}");
+		else if (node->data->rights[0] == 'p')
+			ft_printf("{yellow}");
+		else if (node->data->rights[0] == '-')
+			if (node->data->rights[3] == 'x' || node->data->rights[6] == 'x' || node->data->rights[9] == 'x')
+				ft_printf("{red}");
+	}
+}
+
+void remove_color(t_init *init)
+{
+	if (init->flag & FLAG_G)
+		ft_printf("{eoc}");
+}
+
 /*
  * подробная печать
  */
@@ -64,10 +88,12 @@ void	print_l(t_init *init, t_node *node)
 		init->max_group, node->data->group);
 	if (init->major)
 		ft_printf("%s", node->data->major);
-	ft_printf("%*llu %s %5s %s", (u_int32_t)init->max_size, node->data->size_minor,
+	ft_printf("%*llu %s %5s ", (u_int32_t)init->max_size, node->data->size_minor,
 		node->data->month_day,
-		node->data->time_year,
-		node->data->name);
+		node->data->time_year);
+	insert_color(init, node);
+	ft_printf("%s", node->data->name);
+	remove_color(init);
 	if (node->data->link_to_file)
 		ft_printf(" -> %s", node->data->link_to_file);
 	ft_printf("\n");
@@ -80,10 +106,12 @@ void	print_g(t_init *init, t_node *node)
 			  init->max_group, node->data->group);
 	if (init->major)
 		ft_printf("%s", node->data->major);
-	ft_printf("%*llu %s %5s %s", (u_int32_t)init->max_size, node->data->size_minor,
+	ft_printf("%*llu %s %5s ", (u_int32_t)init->max_size, node->data->size_minor,
 			  node->data->month_day,
-			  node->data->time_year,
-			  node->data->name);
+			  node->data->time_year);
+	insert_color(init, node);
+	ft_printf("%s", node->data->name);
+	remove_color(init);
 	if (node->data->link_to_file)
 		ft_printf(" -> %s", node->data->link_to_file);
 	ft_printf("\n");
@@ -93,8 +121,9 @@ void	print_g(t_init *init, t_node *node)
  */
 void	print_1(t_init *init, t_node *node)
 {
-    if (init)
-		ft_printf("%s\n", node->data->name);
+	insert_color(init, node);
+	ft_printf("%s\n", node->data->name);
+	remove_color(init);
 }
 
 void	create_col_structs(t_init *init)
